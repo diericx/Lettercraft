@@ -5,7 +5,7 @@ function M.new()
 	local guiGroup = display.newGroup()
 	local letterSpawnTime = 80
 	local score = 0
-	local currentTime = 100
+	local currentTime = 150
 	local timeSubtractor = 0.1
 	local timeCapacity = currentTime
 	local letterSpawnCooldown = letterSpawnTime
@@ -57,7 +57,7 @@ function M.new()
 	topBar.alpha = 0.6
 
 	local scoreTxt = display.newText(guiGroup, score, 0, 0, "Hiruko", 50)
-	scoreTxt.x = cw/2
+	scoreTxt.x = cw/2 + 2
 	scoreTxt.y = 30
 	scoreTxt:setTextColor(255, 215, 0)
 
@@ -120,12 +120,18 @@ function M.new()
 					print(isWordValid)
 					if isWordValid == true then
 						print("YOU WIN YOU WINNER!")
+						scoreToAdd = 0
 						for i = 1, #chosenLetters do
-							score = score + chosenLetters[i].value
+							scoreToAdd = scoreToAdd + chosenLetters[i].value
 							scoreTxt.text = score
 							transition.to(chosenLetters[i], {x = 1000, onComplete = function() clearChosenLetter(i) end})
 							transition.to(chosenLetters[i].letterTxt, {x = 1000, onComplete = function() end})
 						end
+						--add to the score
+						score = score + (scoreToAdd * #chosenLetters)
+						scoreTxt.text = score
+						--add to the time
+						currentTime = currentTime + (scoreToAdd * #chosenLetters)
 						word = ""
 						chosenLetters = {}
 					end
@@ -219,7 +225,7 @@ function M.new()
 	local function enterFrame()
 		if letterSpawnCooldown > 0 then
 			letterSpawnCooldown = letterSpawnCooldown - 1
-		elseif letterSpawnCooldown <= 0 then
+		elseif letterSpawnCooldown <= 0.1 then
 			spawnLetter()
 			letterSpawnCooldown = letterSpawnTime
 		end

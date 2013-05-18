@@ -29,6 +29,14 @@ alphabet = {
 	{letter="P", value=3}, {letter="Q", value=10}, {letter="R", value=1}, {letter="S", value=1}, {letter="T", value=1}, 
 	{letter="U", value=1}, {letter="V", value=4}, {letter="W", value=4}, {letter="X", value=8}, {letter="Y", value=4}, 
 	{letter="Z", value=10}, 
+	--MORE VOWELS!
+	{letter="A", value=1},
+	{letter="E", value=1},
+	{letter="I", value=1},
+	{letter="O", value=1},
+	{letter="U", value=1},
+	--AND SOMETIMES Y!
+	{letter="Y", value=4},
 }
 print(alphabet[1].letter)
 
@@ -56,9 +64,9 @@ end
 Runtime:addEventListener("enterFrame", enterFrame)
 
 function randomLetter()
-	local randomNumber = math.random(1, 26)
+	local randomNumber = math.random(1, 32)
 	local letter
-	for i = 1, 26 do 
+	for i = 1, 32 do 
 		if randomNumber == i then
 			letter = { text = alphabet[i].letter, value = alphabet[i].value }
 		end
