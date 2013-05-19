@@ -1,5 +1,6 @@
 local M = {}
-
+	local bg = display.newImage("images/bg2.png", 10, 0)
+	bg:scale(1.2, 1)
 function M.new()
 	local group = display.newGroup()
 	native.setKeyboardFocus( nil )
@@ -15,10 +16,8 @@ function M.new()
 		headers["Authorization"] = "Token token="..tostring(userInfo.authKey)
 	end
 
-	local bg = display.newImage(group, "Images/bg.png", 0, 0)
-	bg:rotate(0)
-	bg.x = cw/2
-	bg.y = ch/2
+	-- local bg = display.newRect(group, 0, 0, cw, ch)
+	-- bg:setFillColor(250, 250, 250)
 
 	local mail = display.newImage(group, "Images/mail.png", -100, 0)
 	mail:setReferencePoint( display.CenterReferencePoint )
@@ -86,8 +85,8 @@ function M.new()
 		timer.performWithDelay( 100, function () director:changeScene("game") end, 1)
 	end
 
-	local playBtn = displayNewButton(group, "Images/buttonUpMenu.png", "Images/buttonDownMenu.png", cw/2 - 175, cw/2, false, 1, 0, nil, "Play", "Hiruko", 80, displayLoadingScreen, nil)
-	local leaderboardsBtnH = displayNewButton(group, "Images/buttonUpMenu.png", "Images/buttonDownMenu.png", cw/2 - 175, cw/2 + 200, false, 1, 0, "leaderboards", "Highscores", "DimitriSwank", 57, nil, nil)
+	local playBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2, false, 1, 0, nil, "Rush", "Hiruko", 80, displayLoadingScreen, nil)
+	local leaderboardsBtnH = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 200, false, 1, 0, "game", "Infini-Fall", "Hiruko", 80, nil, nil)
 	local creditsBtn = displayNewButton(group, "Images/buttonUpSmall.png", "Images/buttonDownSmall.png", cw-200, 10, false, 1, nil, "creditsPage", "Credits", "DimitriSwank", 40, nil, nil)	
 
 	--group:insert(leaderboardsBtnH)

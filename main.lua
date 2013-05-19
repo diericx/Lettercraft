@@ -147,6 +147,7 @@ function displayNewButton(group, image, imageDown, x, y, shouldScale, scaleX, ti
 	if text ~= nil then
 		newBtn.text = btnText
 		btnText = display.newText( text, newBtn.x, newBtn.y, font, textSize )
+		btnText:setTextColor(150,150,150)
 		btnText.x, btnText.y = newBtn.x, newBtn.y + 7
 		btnGroup:insert(btnText)
 	end

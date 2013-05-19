@@ -3,10 +3,11 @@ local M = {}
 function M.new()
 	local group = display.newGroup()
 	local guiGroup = display.newGroup()
-	local letterSpawnTime = 80
+	local letterSpawnTime = 70
 	local score = 0
 	local currentTime = 150
-	local timeSubtractor = 0.1
+	local timeSubtractor = 0.05
+	local letterSpeed = 115
 	local timeCapacity = currentTime
 	local letterSpawnCooldown = letterSpawnTime
 	local swipeStartX
@@ -45,11 +46,15 @@ function M.new()
 
 	local chosenLetters = {}
 
-	local bg = display.newRect(group, 0, 0, cw, ch)
-	bg:setFillColor(250, 250, 250)
+	-- local bg = display.newRect(group, 0, 0, cw, ch)
+	-- bg:setFillColor(250, 250, 250)
 
-	local botBar = display.newRect(guiGroup, 0, ch-150, cw, 150)
-	botBar:setFillColor(150,150,150)
+	-- local botBar = display.newRect(guiGroup, 0, ch-150, cw, 150)
+	-- botBar:setFillColor(150,150,150)
+	-- botBar.alpha = 0.8
+	local botBar = display.newImage(guiGroup, "images/bar.png", 0, ch - 123)
+	botBar:setFillColor(200, 200, 200)
+	botBar:scale(1, 1.5)
 	botBar.alpha = 0.8
 
 	local topBar = display.newRect(guiGroup, 0, 0, cw, 50)
@@ -204,13 +209,14 @@ function M.new()
 		local letterBox = display.newRect(group, 0, 0, cw/5 - 10, cw/5)
 		letters[lettersTablePos] = letterBox
 		letterBox:setFillColor(220, 220, 220)
+		letterBox.strokeWidth = 4
 		letterBox.x = i*xPos + ((letterBox.width)/2) + 5
 		letterBox.y = -100
 		letterBox.id = lettersTablePos
 		letterBox.value = randomLetter.value
 		letterBox.letter = randomLetter.text
 		physics.addBody(letterBox, {isSensor = true})
-		letterBox:setLinearVelocity(0, 100, letterBox.x, letterBox.y)
+		letterBox:setLinearVelocity(0, letterSpeed, letterBox.x, letterBox.y)
 		--create letter
 		local letter = display.newText(group, "A", 0, 0, "Hiruko", 80)
 		letter.text = randomLetter.text
