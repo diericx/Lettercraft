@@ -49,7 +49,7 @@ function M.new()
 	-- local bg = display.newRect(group, 0, 0, cw, ch)
 	-- bg:setFillColor(250, 250, 250)
 
-	local bg = display.newImage(group, "images/bg2.png", 10, 0)
+	local bg = display.newImage(group, "images/bg3.png", 10, 0)
 	bg:scale(1.2, 1)
 
 	-- local botBar = display.newRect(guiGroup, 0, ch-150, cw, 150)
