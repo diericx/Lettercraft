@@ -1,6 +1,4 @@
 local M = {}
-	local bg = display.newImage("images/bg2.png", 10, 0)
-	bg:scale(1.2, 1)
 function M.new()
 	local group = display.newGroup()
 	native.setKeyboardFocus( nil )
@@ -18,6 +16,8 @@ function M.new()
 
 	-- local bg = display.newRect(group, 0, 0, cw, ch)
 	-- bg:setFillColor(250, 250, 250)
+	local bg = display.newImage(group, "images/bg2.png", 10, 0)
+	bg:scale(1.2, 1)
 
 	local mail = display.newImage(group, "Images/mail.png", -100, 0)
 	mail:setReferencePoint( display.CenterReferencePoint )
@@ -85,7 +85,7 @@ function M.new()
 		timer.performWithDelay( 100, function () director:changeScene("game") end, 1)
 	end
 
-	local playBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2, false, 1, 0, nil, "Rush", "Hiruko", 80, displayLoadingScreen, nil)
+	local rushBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2-300, false, 1, 0, "game", "Rush", "Hiruko", 80, nil, nil)
 	local leaderboardsBtnH = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 200, false, 1, 0, "game", "Infini-Fall", "Hiruko", 80, nil, nil)
 	local creditsBtn = displayNewButton(group, "Images/buttonUpSmall.png", "Images/buttonDownSmall.png", cw-200, 10, false, 1, nil, "creditsPage", "Credits", "DimitriSwank", 40, nil, nil)	
 

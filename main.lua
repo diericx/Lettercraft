@@ -117,20 +117,20 @@ if userInfo ~= nil and userInfo.authKey ~= nil then
 	headers["Authorization"] = "Token token="..tostring(userInfo.authKey)
 	print(userInfo.authKey, userInfo.username, userInfo.password)
 end
-
-director = {
-    scene = 'main',
-    changeScene = function (self, moduleName)
-        if type(moduleName) == 'nil' or self.scene == moduleName then return end
-        if self.clean and type(self.clean) == 'function' then self.clean() end
-        if self.view then self.view:removeSelf() end
-        if self.scene ~= 'main' and type(package.loaded[self.scene]) == 'table' then
-            package.loaded[self.scene], self.view = nil
-            collectgarbage('collect')
-        end
-        self.scene, self.view, self.clean = moduleName, require(moduleName).new()
-    end
-}
+director = require("director")
+-- director = {
+--     scene = 'main',
+--     changeScene = function (self, moduleName)
+--         if type(moduleName) == 'nil' or self.scene == moduleName then return end
+--         if self.clean and type(self.clean) == 'function' then self.clean() end
+--         if self.view then self.view:removeSelf() end
+--         if self.scene ~= 'main' and type(package.loaded[self.scene]) == 'table' then
+--             package.loaded[self.scene], self.view = nil
+--             collectgarbage('collect')
+--         end
+--         self.scene, self.view, self.clean = moduleName, require(moduleName).new()
+--     end
+-- }
 
 function displayNewButton(group, image, imageDown, x, y, shouldScale, scaleX, timeToScale, sceneToGoTo, text, font, textSize, customFunction, id)
 	local btnGroup = display.newGroup()
@@ -181,7 +181,7 @@ function displayNewButton(group, image, imageDown, x, y, shouldScale, scaleX, ti
 						if overlayBtn then
 							--btnGroup:removeSelf()
 						end
-						director:changeScene(sceneToGoTo)
+						director:changeScene(sceneToGoTo, "crossfade")
 					end
 				end
 			--end

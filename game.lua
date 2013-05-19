@@ -49,6 +49,9 @@ function M.new()
 	-- local bg = display.newRect(group, 0, 0, cw, ch)
 	-- bg:setFillColor(250, 250, 250)
 
+	local bg = display.newImage(group, "images/bg2.png", 10, 0)
+	bg:scale(1.2, 1)
+
 	-- local botBar = display.newRect(guiGroup, 0, ch-150, cw, 150)
 	-- botBar:setFillColor(150,150,150)
 	-- botBar.alpha = 0.8
@@ -71,8 +74,9 @@ function M.new()
 	--   { 255, 255, 0 },
 	--   "right" )
 
-	local timeBar = display.newRect(0, 50, cw, 10)
-	timeBar:setFillColor(52, 152, 219)
+	local timeBar = display.newRect(guiGroup, 0, 50, cw, 10)
+	--timeBar:setFillColor(52, 152, 219)
+	timeBar:setFillColor(243, 156, 18)
 	timeBar.alpha = topBar.alpha
 	-- local timeCapacityUI = display.newRect(0, 50, cw, 10)
 	-- timeCapacityUI:setFillColor(fartbarGradient)
@@ -226,6 +230,8 @@ function M.new()
 		--add listener for tap on letter
 		letterBox.tap = selectLetter
 		letterBox:addEventListener("tap", letterBox)
+
+		guiGroup:toFront()
 	end
 
 	local function enterFrame()
