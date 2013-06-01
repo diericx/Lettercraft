@@ -1,11 +1,11 @@
 local M = {}
 function M.new()
+	require "multiline_text"
 	local group = display.newGroup()
-	native.setKeyboardFocus( nil )
 
 	--check for ser info, if there create header
 	local userInfo = Load("userInfo", userInfo)
-
+	gameMode = "Rush"
 	--server stuff
 	headers = {}
 	headers["Accept"] = "application/json"
@@ -16,12 +16,24 @@ function M.new()
 
 	-- local bg = display.newRect(group, 0, 0, cw, ch)
 	-- bg:setFillColor(250, 250, 250)
-	local bg = display.newImage(group, "images/bg2.png", 10, 0)
+	local bg = display.newImage(group, "Images/bg2.png", 10, 0)
 	bg:scale(1.2, 1)
+
+	local multiLineText = display.newMultiLineText  
+        {
+        text = "Report missing words!",
+        width = cw,                  --OPTIONAL        Defailt : nil 
+        left = 0,top = cw+270,             --OPTIONAL        Default : left = 0,top=0
+        font = "Hiruko",     --OPTIONAL        Default : native.systemFont
+        fontSize = 40,                --OPTIONAL        Default : 14
+        color = {237,67,55},              --OPTIONAL        Default : {0,0,0}
+        align = "center"              --OPTIONAL   Possible : "left"/"right"/"center"
+        }
+        multiLineText.x = cw/2
 
 	local mail = display.newImage(group, "Images/mail.png", -100, 0)
 	mail:setReferencePoint( display.CenterReferencePoint )
-	mail.x = cw/2 + 200
+	mail.x = cw/2 + 10
 	mail.y = ch - 135
 	mail:scale(0.8,0.8)
 
@@ -35,9 +47,9 @@ function M.new()
 
 	local audioAnimation = display.newSprite( mySheet, sequenceData )
 	group:insert(audioAnimation)
-	audioAnimation:scale(0.85, 0.85)
-	audioAnimation.x = display.contentWidth/2 - 160  --center the sprite horizontally
-	audioAnimation.y = display.contentHeight/2 + 370  --center the sprite vertically
+	audioAnimation:scale(0.5, 0.5)
+	audioAnimation.x = display.contentWidth/2 - 230  --center the sprite horizontally
+	audioAnimation.y = 80  --center the sprite vertically
 	audioAnimation:setFrame(1)
 
 	local function updateAudioToggle()
@@ -66,28 +78,29 @@ function M.new()
 	audioAnimation:addEventListener("tap", toggleAudio)
 	 	
 	local function newMail(event)
-		system.openURL( "mailto:appdojostudios@gmail.com?subject=Llama Or Duck Game&body=")
+		-- system.openURL( "mailto:appdojostudios@gmail.com?subject=Llama Or Duck Game&body=")
+		--ios
+	local options =
+	{
+	   to = "appdojostudios@gmail.com",
+	   subject = "I Found a Missing Word!",
+	   body = ""
+	}
+	native.showPopup("mail", options)
 	end
 	mail:addEventListener("tap", newMail)
 
-	local function displayLoadingScreen()
-		local loadingScreen = display.newRect(group, 0, 0, cw, ch)
-		loadingScreen:setFillColor(0,0,0)
-		loadingScreen.alpha = 0.5
-		local loadingText = display.newText(group, "Loading...", cw/2 , ch/2, "DimitriSwank", 60)
-		loadingText.x = cw/2
-		loadingText.y = ch/2 - 39
-
-		local function loadingScreenListener()
-			return true
-		end
-		loadingScreen:addEventListener("touch", loadingScreenListener)
-		timer.performWithDelay( 100, function () director:changeScene("game") end, 1)
+	local function setInfini()
+		gameMode="InfiniFall"
 	end
 
-	local rushBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2-300, false, 1, 0, "game", "Rush", "Hiruko", 80, nil, nil)
-	local leaderboardsBtnH = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 200, false, 1, 0, "game", "Infini-Fall", "Hiruko", 80, nil, nil)
-	local creditsBtn = displayNewButton(group, "Images/buttonUpSmall.png", "Images/buttonDownSmall.png", cw-200, 10, false, 1, nil, "creditsPage", "Credits", "DimitriSwank", 40, nil, nil)	
+	local function setWallTWall()
+		gameMode="WallToWall"
+	end
+
+	local rushBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2-300, false, 1, 0, "game", "Rush", 150, 150, 150, "Hiruko", 80, nil, nil)
+	local infiniBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 20, false, 1, 0, "game", "Infini-Fall", 150, 150, 150, "Hiruko", 80, setInfini, nil)
+	local wallToWallBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 180, false, 1, 0, "game", "Wall To Wall", 150, 150, 150, "Hiruko", 70, setWallTWall, nil)
 
 	--group:insert(leaderboardsBtnH)
 	--director:changeScene("game")

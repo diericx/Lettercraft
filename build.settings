@@ -15,7 +15,7 @@ settings = {
 			--UIApplicationExitsOnSuspend = true, -- uncomment to quit app on suspend
             UIAppFonts = 
                 {
-                    "HirukoExtraLight.otf"
+                    "Hiruko.otf"
                 }
 
             --[[

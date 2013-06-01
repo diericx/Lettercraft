@@ -6,10 +6,9 @@ function M.new()
 	local letterSpawnTime = 70
 	local score = 0
 	local currentScore = score
-	local currentTime = 150 -- 150
-	local timeSubtractor = 0.05
+	local currentTime = 140
+	local timeSubtractor = 0.1
 	local letterSpeed = 115
-	local canDisplayGameOver = true
 	local timeCapacity = currentTime
 	local letterSpawnCooldown = letterSpawnTime
 	local swipeStartX
@@ -20,22 +19,12 @@ function M.new()
 	local enterFrame
 	physics = require("physics")
 	sqlite3 = require ("sqlite3")
-	--audio load
-	local buttonSound1 = audio.loadSound( "button.mp3" )
-	local buttonSound2 = audio.loadSound( "button2.mp3" )
 	--Sqlite setup
 	local path = system.pathForFile("dictionary.sqlite")
 	local db = sqlite3.open( path ) --remember to close
 	--physics setup
 	physics.start()
 	physics.setGravity(0,0) 
-
-	--change settings according to game mode
-	if gameMode == "WallToWall" then
-		currentTime = 140
-		timeCapacity = currentTime
-		timeSubtractor = 0.1
-	end
 
 	local function untouchable ()
 		print("Aint nobody gon touch mah chillen")
@@ -78,9 +67,6 @@ function M.new()
 	topBar.alpha = 0.6
 	topBar:addEventListener("touch", untouchable)
 
-	local deleteBar = display.newRect(group, 0, ch + 150, cw, 10)
-	physics.addBody(deleteBar, "static")
-
 	local scoreTxt = display.newText(guiGroup, currentScore, 0, 0, "Hiruko", 50)
 	scoreTxt.x = cw/2 + 2
 	scoreTxt.y = 30
@@ -101,16 +87,8 @@ function M.new()
 	timeBar.alpha = topBar.alpha
 	-- local timeCapacityUI = display.newRect(0, 50, cw, 10)
 	-- timeCapacityUI:setFillColor(fartbarGradient)
-	local function deleteBarCollision(event)
-		display.remove(event.other.letterTxt)
-		display.remove(event.other.overlay)
-		display.remove(event.other.letterMultTxt)
-		display.remove(event.other)
 
-	end
-	deleteBar:addEventListener("collision", deleteBarCollision)
-
-	local function menu(option)
+	local function pause(option)
 		local pausedText
 		local divider
 		local resumeButton
@@ -120,9 +98,9 @@ function M.new()
 		fade:addEventListener("tap", untouchable)
 		fade:setFillColor(0,0,0)
 		fade.alpha = 0.6
+		setEnterFrame(nil)
+		physics.pause()
 		if option == "menu" then
-			setEnterFrame(nil)
-			physics.pause()
 			--resume game
 			local function resume()
 				display.remove(pausedText)
@@ -150,41 +128,9 @@ function M.new()
 			resumeButton = displayNewButton(guiGroup, "Images/buttonResume.png", "Images/buttonResumeTapped.png", cw/2 - 258, divider.y + 20, false, 1, 0, nil, "Resume", 255, 255, 255, "Hiruko", 50, resume, 1)
 			--Quit Button
 			quitButton = displayNewButton(guiGroup, "Images/buttonExit.png", "Images/buttonExitTapped.png", cw/2 - 258, divider.y + 120, false, 1, 0, nil, "Quit", 255, 255, 255, "Hiruko", 50, quit, 1)
-		elseif option == "end" then
-			--resume game
-			local function resume()
-				display.remove(pausedText)
-				display.remove(fade)
-				display.remove(divider)
-				display.remove(resumeButton)
-				display.remove(quitButton)
-				physics.stop()
-				setEnterFrame(nil)
-				director:changeScene("game")
-			end
-			local function quit()
-				display.remove(pausedText)
-				display.remove(fade)
-				display.remove(divider)
-				display.remove(resumeButton)
-				display.remove(quitButton)
-				physics.stop()
-				setEnterFrame(nil)
-				director:changeScene("menu", "crossfade")
-			end
-			--create buttons and text
-			pausedText = display.newText(guiGroup, "Game Over!", 0, 0, "Hiruko", 60)
-			pausedText.x, pausedText.y = cw/2, ch/2-300
-			divider = display.newRect(guiGroup, 0, 0, cw-250, 5)
-			divider.x, divider.y = cw/2, pausedText.y + 30
-			--Resume Button
-			resumeButton = displayNewButton(guiGroup, "Images/buttonResume.png", "Images/buttonResumeTapped.png", cw/2 - 258, divider.y + 20, false, 1, 0, nil, "Replay", 255, 255, 255, "Hiruko", 50, resume, 1)
-			--Quit Button
-			quitButton = displayNewButton(guiGroup, "Images/buttonExit.png", "Images/buttonExitTapped.png", cw/2 - 258, divider.y + 120, false, 1, 0, nil, "Quit", 255, 255, 255, "Hiruko", 50, quit, 1)
-
 		end
 	end
-	menuButton.tap = function() menu("menu") end
+	menuButton.tap = function() pause("menu") end
 	menuButton:addEventListener("tap", menuButton)
 	--clear only one letter
 	local function clearChosenLetter(i)
@@ -218,7 +164,7 @@ function M.new()
 			swipeEndY = event.y 
 			local xDif = swipeEndX - swipeStartX
 			--find end x and end y and see if it was a swipe
-			if swipeStartX < swipeEndX and xDif > 50 then -- check X for swipe
+			if swipeStartX < swipeEndX and xDif > 125 then -- check X for swipe
 				--if startY == (endY+20) or startY == (endY-20) then
 					swipe = true
 					print("WAS A SWIPE!!!")
@@ -240,8 +186,6 @@ function M.new()
 							scoreTxt.text = score
 							transition.to(chosenLetters[i], {x = 1000, onComplete = function() clearChosenLetter(i) end})
 							transition.to(chosenLetters[i].letterTxt, {x = 1000, onComplete = function() end})
-							transition.to(chosenLetters[i].overlay, {x = 1000, onComplete = function() end})	
-							transition.to(chosenLetters[i].letterMultTxt, {x = 1000, onComplete = function() end})	
 						end
 						--add to the score
 						score = score + (scoreToAdd * #chosenLetters)
@@ -252,7 +196,7 @@ function M.new()
 						chosenLetters = {}
 					elseif isWordValid ~= true then 
 						for i = 1, #chosenLetters do 
-							transition.to(chosenLetters[i].overlay, {alpha = 0.6, time=200})
+							chosenLetters[i]:setFillColor(255, 0, 0)
 						end
 					end
 				end
@@ -272,8 +216,6 @@ function M.new()
 							end
 						end
 						transition.to(chosenLetters[i].letterTxt, {xScale = 0.01, yScale = 0.01, time = 150})
-						transition.to(chosenLetters[i].overlay, {xScale = 0.01, yScale = 0.01, time = 150})
-						transition.to(chosenLetters[i].letterMultTxt, {xScale = 0.01, yScale = 0.01, time = 150})
 						transition.to(chosenLetters[i], {xScale = 0.01, yScale = 0.01, time = 150,  onComplete = dealWithLetters})
 					end	
 				end
@@ -285,98 +227,40 @@ function M.new()
 	botBar:addEventListener("touch", clearChosenLetterTable)
 
 	local function selectLetter(self, event)
-		if #chosenLetters < 5 then
-			if event.phase == "began" then
-				audio.play(buttonSound1)
-			elseif event.phase == "ended" then
-				audio.play(buttonSound2)
-				local xPos = cw/5
-				local tablePos = #chosenLetters + 1
-				print(tablePos)
-				chosenLetters[tablePos] = self -- add the letter to one of the chosen letters
-				self:setLinearVelocity(0, 0, self.x, self.y) -- remove any velocity
-				self.touch = nil
-				--check to see if it is a correct answer AFTER it transitions
-				local function checkWordValidity()
-					word = ""
-					for i = 1, #chosenLetters do
-						word = word..tostring(chosenLetters[i].letter)
-					end
-					print(word, "WORD CREATED")
+		if event.phase == "ended" then
+			local xPos = cw/5
+			local tablePos = #chosenLetters + 1
+			print(tablePos)
+			chosenLetters[tablePos] = self -- add the letter to one of the chosen letters
+			self:setLinearVelocity(0, 0, self.x, self.y) -- remove any velocity
+			self.touch = nil
+			--check to see if it is a correct answer AFTER it transitions
+			local function checkWordValidity()
+				word = ""
+				for i = 1, #chosenLetters do
+					word = word..tostring(chosenLetters[i].letter)
 				end
-				local scaleTime = 140
-				local function moveToPosition()
-					guiGroup:insert(self) -- put rect in the top most group
-					guiGroup:insert(self.overlay) -- put overlay in top most group
-					guiGroup:insert(letters[self.id].letterTxt) -- put text in top most group
-					guiGroup:insert(letters[self.id].letterMultTxt) -- put multiplier text in top most group
-
-					self.x = (tablePos-1) * xPos + ((self.width)/2) + 5 
-					self.y = botBar.y 
-					transition.to( self, { time=scaleTime, xScale = 1, yScale = 1, onComplete = function() self.tap = nil end}) 
-					self.letterTxt.x = (tablePos-1) * xPos + ((self.width)/2) + 5 
-					self.letterTxt.y = botBar.y 
-					transition.to( self.letterTxt, { time=scaleTime, xScale = 1, yScale = 1}) 
-					transition.to( self.overlay, { time=scaleTime, xScale = 1, yScale = 1 } )
-					transition.to( self.letterMultTxt, { time=scaleTime, xScale = 1, yScale = 1, onComplete = checkWordValidity } )
-
-				end
-				transition.to( self, { time=scaleTime, xScale = 0.01, yScale = 0.01 } )
-				transition.to( self.letterTxt, { time=scaleTime, xScale = 0.01, yScale = 0.01 } )
-				transition.to( self.overlay, { time=scaleTime, xScale = 0.01, yScale = 0.01 } )
-				transition.to( self.letterMultTxt, { time=scaleTime, xScale = 0.01, yScale = 0.01, onComplete=moveToPosition } )
+				print(word, "WORD CREATED")
 			end
+			local scaleTime = 150
+			local function moveToPosition()
+				guiGroup:insert(self) -- put rect in the top most group
+				guiGroup:insert(letters[self.id].letterTxt) -- put text in top most group
+				self.x = (tablePos-1) * xPos + ((self.width)/2) + 5 
+				self.y = botBar.y 
+				transition.to( self, { time=scaleTime, xScale = 1, yScale = 1, onComplete = function() self.tap = nil end}) 
+				self.letterTxt.x = (tablePos-1) * xPos + ((self.width)/2) + 5 
+				self.letterTxt.y = botBar.y 
+				transition.to( self.letterTxt, { time=scaleTime, xScale = 1, yScale = 1, onComplete = checkWordValidity}) 
+
+			end
+			transition.to( self, { time=scaleTime, xScale = 0.01, yScale = 0.01 } )
+			transition.to( self.letterTxt, { time=scaleTime, xScale = 0.01, yScale = 0.01, onComplete=moveToPosition } )
 		end
 	end
 
-	--spawn letters that fall randomly
+	--spawn letters that fall
 	local function spawnLetter()
-		local i = math.random(0,4)
-		local letter = math.random(1, 3)
-		local chanceToMultiply = math.random(1, 100)
-		local xPos = cw/5
-		local lettersTablePos = #letters + 1
-		local randomLetter = randomLetter()
-		--create letter outline
-		local letterBox = display.newRect(group, 0, 0, cw/5 - 10, cw/5)
-		letters[lettersTablePos] = letterBox
-		letterBox:setFillColor(220, 220, 220)
-		letterBox.strokeWidth = 4
-		letterBox.x = i*xPos + ((letterBox.width)/2) + 5
-		letterBox.y = -100
-		letterBox.id = lettersTablePos
-		letterBox.value = randomLetter.value
-		letterBox.letter = randomLetter.text
-		letterBox.multiplier = 1
-		physics.addBody(letterBox, {isSensor = true})
-		letterBox:setLinearVelocity(0, letterSpeed, letterBox.x, letterBox.y)
-		--letter overlay
-		local letterOverlay = display.newRect(group, 0, 0, cw/5-10, cw/5)
-		letterOverlay:setFillColor(255, 0, 0)
-		letterOverlay.alpha = 0.01
-		letterBox.overlay = letterOverlay
-		--create letter
-		local letter = display.newText(group, "A", 0, 0, "Hiruko", 80)
-		letter.text = randomLetter.text
-		letter.id = lettersTablePos
-		letters[lettersTablePos].letterTxt = letter
-		letter:setTextColor(64, 64, 64)
-		--add listener for tap on letter
-		letterBox.touch = selectLetter
-		letterBox:addEventListener("touch", letterBox)
-
-		if chanceToMultiply > 1 and chanceToMultiply < 100 then 
-			local letterMultTxt = display.newText(group, "x2", 0, 0, "Hiruko", 20)
-			letterMultTxt.x, letterMultTxt.y = letterBox.x, letterBox.y
-			letterOverlay.alpha = 0.25
-			letterBox.letterMultTxt = letterMultTxt
-			letterOverlay:setFillColor(0, 0, 255)
-		end
-
-		guiGroup:toFront()
-	end
-	--fill screen with letters
-	local function spawnLetterWallToWall()
 		for i = 0, 4 do
 			print("spawn letter")
 			local letter = math.random(1, 3)
@@ -395,11 +279,6 @@ function M.new()
 			letterBox.letter = randomLetter.text
 			physics.addBody(letterBox, {isSensor = true})
 			letterBox:setLinearVelocity(0, letterSpeed, letterBox.x, letterBox.y)
-			--letter overlay
-			local letterOverlay = display.newRect(group, 0, 0, cw/5-10, cw/5)
-			letterOverlay:setFillColor(255, 0, 0)
-			letterOverlay.alpha = 0.01
-			letterBox.overlay = letterOverlay
 			--create letter
 			local letter = display.newText(group, "A", 0, 0, "Hiruko", 80)
 			letter.text = randomLetter.text
@@ -414,22 +293,11 @@ function M.new()
 		end
 	end
 
-	local function endGame()
-		-- setEnterFrame(nil)
-		-- physics.stop()
-		menu("end")
-	end
-
 	enterFrame = function ()
 		if letterSpawnCooldown > 0 then
 			letterSpawnCooldown = letterSpawnCooldown - 1
 		elseif letterSpawnCooldown <= 0.1 then
-			--spawn letters according to the game mode
-			if gameMode == "WallToWall" then
-				spawnLetterWallToWall()
-			else
-				spawnLetter()
-			end
+			spawnLetter()
 			letterSpawnCooldown = letterSpawnTime
 		end
 		if currentScore < score then
@@ -442,25 +310,12 @@ function M.new()
 					if letters[i].letterTxt.x ~= nil then
 						letters[i].letterTxt.x = letters[i].x
 						letters[i].letterTxt.y = letters[i].y
-						letters[i].overlay.x = letters[i].x
-						letters[i].overlay.y = letters[i].y
-						letters[i].letterMultTxt.x = letters[i].x + (letters[i].width/2) - 18
-						letters[i].letterMultTxt.y = letters[i].y - (letters[i].height/2) + 18
 					end
 				end
 			end
 		end
-		if gameMode == "InfiniFall" then
-		else 
-			currentTime = currentTime - timeSubtractor
-			updateTimeBar()
-			if currentTime <= 0 then
-				if canDisplayGameOver then
-					canDisplayGameOver = false
-					endGame()
-				end
-			end
-		end
+		currentTime = currentTime - timeSubtractor
+		updateTimeBar()
 	end
 
 	setEnterFrame(enterFrame)

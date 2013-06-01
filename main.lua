@@ -132,7 +132,7 @@ director = require("director")
 --     end
 -- }
 
-function displayNewButton(group, image, imageDown, x, y, shouldScale, scaleX, timeToScale, sceneToGoTo, text, font, textSize, customFunction, id)
+function displayNewButton(group, image, imageDown, x, y, shouldScale, scaleX, timeToScale, sceneToGoTo, text, tr, tg, tb, font, textSize, customFunction, id)
 	local btnGroup = display.newGroup()
 	group:insert(btnGroup)
 	local newBtn = display.newImage(image, 0, 0 )
@@ -147,7 +147,7 @@ function displayNewButton(group, image, imageDown, x, y, shouldScale, scaleX, ti
 	if text ~= nil then
 		newBtn.text = btnText
 		btnText = display.newText( text, newBtn.x, newBtn.y, font, textSize )
-		btnText:setTextColor(150,150,150)
+		btnText:setTextColor(tr,tg,tb)
 		btnText.x, btnText.y = newBtn.x, newBtn.y + 7
 		btnGroup:insert(btnText)
 	end
@@ -163,7 +163,7 @@ function displayNewButton(group, image, imageDown, x, y, shouldScale, scaleX, ti
 				overlayBtn = display.newImage(btnGroup, imageDown, 0, 0)
 				btnGroup:insert(overlayBtn)
 				btnText:toFront()
-				btnText.alpha = 0.7
+				btnText.alpha = 0.5
 			end
 		elseif event.phase == "ended" then
 			btnText.alpha = 1
