@@ -21,11 +21,11 @@ function M.new()
 
 	local multiLineText = display.newMultiLineText  
         {
-        text = "Report missing words!",
+        text = "Report missing words or give feedback.",
         width = cw,                  --OPTIONAL        Defailt : nil 
         left = 0,top = cw+270,             --OPTIONAL        Default : left = 0,top=0
         font = "Hiruko",     --OPTIONAL        Default : native.systemFont
-        fontSize = 40,                --OPTIONAL        Default : 14
+        fontSize = 35,                --OPTIONAL        Default : 14
         color = {237,67,55},              --OPTIONAL        Default : {0,0,0}
         align = "center"              --OPTIONAL   Possible : "left"/"right"/"center"
         }
@@ -80,13 +80,14 @@ function M.new()
 	local function newMail(event)
 		-- system.openURL( "mailto:appdojostudios@gmail.com?subject=Llama Or Duck Game&body=")
 		--ios
-	local options =
-	{
-	   to = "appdojostudios@gmail.com",
-	   subject = "I Found a Missing Word!",
-	   body = ""
-	}
-	native.showPopup("mail", options)
+		print("New MAil")
+		local options =
+		{
+		   to = "appdojostudios@gmail.com",
+		   subject = "I Found a Missing Word!",
+		   body = ""
+		}
+		native.showPopup("mail", options)
 	end
 	mail:addEventListener("tap", newMail)
 
@@ -98,9 +99,9 @@ function M.new()
 		gameMode="WallToWall"
 	end
 
-	local rushBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2-300, false, 1, 0, "game", "Rush", 150, 150, 150, "Hiruko", 80, nil, nil)
-	local infiniBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 20, false, 1, 0, "game", "Infini-Fall", 150, 150, 150, "Hiruko", 80, setInfini, nil)
-	local wallToWallBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 180, false, 1, 0, "game", "Wall To Wall", 150, 150, 150, "Hiruko", 70, setWallTWall, nil)
+	local rushBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2-300, false, 1, 0, "gameNew", "Rush", 150, 150, 150, "Hiruko", 80, nil, nil)
+	local infiniBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 20, false, 1, 0, "gameNew", "Infini-Fall", 150, 150, 150, "Hiruko", 80, setInfini, nil)
+	local wallToWallBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 180, false, 1, 0, "gameNew", "Wall To Wall", 150, 150, 150, "Hiruko", 68, setWallTWall, nil)
 
 	--group:insert(leaderboardsBtnH)
 	--director:changeScene("game")

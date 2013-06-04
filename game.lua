@@ -273,7 +273,7 @@ function M.new()
 						end
 						transition.to(chosenLetters[i].letterTxt, {xScale = 0.01, yScale = 0.01, time = 150})
 						transition.to(chosenLetters[i].overlay, {xScale = 0.01, yScale = 0.01, time = 150})
-						transition.to(chosenLetters[i].letterMultTxt, {xScale = 0.01, yScale = 0.01, time = 150})
+						transition.to(chosenLetters[i].overlay, {xScale = 0.01, yScale = 0.01, time = 150})
 						transition.to(chosenLetters[i], {xScale = 0.01, yScale = 0.01, time = 150,  onComplete = dealWithLetters})
 					end	
 				end
@@ -367,6 +367,12 @@ function M.new()
 
 		if chanceToMultiply > 1 and chanceToMultiply < 100 then 
 			local letterMultTxt = display.newText(group, "x2", 0, 0, "Hiruko", 20)
+			letterMultTxt.x, letterMultTxt.y = letterBox.x, letterBox.y
+			letterOverlay.alpha = 0.25
+			letterBox.letterMultTxt = letterMultTxt
+			letterOverlay:setFillColor(0, 0, 255)
+		else 
+			local letterMultTxt = display.newText(group, "", 0, 0, "Hiruko", 20)
 			letterMultTxt.x, letterMultTxt.y = letterBox.x, letterBox.y
 			letterOverlay.alpha = 0.25
 			letterBox.letterMultTxt = letterMultTxt
