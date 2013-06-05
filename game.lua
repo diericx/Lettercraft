@@ -23,6 +23,7 @@ function M.new()
 	--audio load
 	local buttonSound1 = audio.loadSound( "button.mp3" )
 	local buttonSound2 = audio.loadSound( "button2.mp3" )
+	local coinSound = audio.loadSound( "coin.wav" )
 	--Sqlite setup
 	local path = system.pathForFile("dictionary.sqlite")
 	local db = sqlite3.open( path ) --remember to close
@@ -439,6 +440,7 @@ function M.new()
 			letterSpawnCooldown = letterSpawnTime
 		end
 		if currentScore < score then
+			audio.play(coinSound)
 			currentScore = currentScore + 1
 			scoreTxt.text = currentScore
 		end
@@ -458,8 +460,8 @@ function M.new()
 		end
 		if gameMode == "InfiniFall" then
 		else 
-			currentTime = currentTime - timeSubtractor
-			updateTimeBar()
+			--currentTime = currentTime - timeSubtractor
+			--updateTimeBar()
 			if currentTime <= 0 then
 				if canDisplayGameOver then
 					canDisplayGameOver = false

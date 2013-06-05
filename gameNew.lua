@@ -17,10 +17,10 @@ function M.new()
 	local letterSpeed = 115
 	local letterSpawnTime = 70
 	local letterSpawnCooldown = letterSpawnTime
-	local currentTime = 10 -- 150
+	local currentTime = 150 -- 150
 	local timeCapacity = currentTime
 	local timeSubtractor = 0.05
-	local doubleChance = 90
+	local doubleChance = 100
 	local canDisplayGameOver = true
 	local swipeStartX
 	local swipeStartY
@@ -30,9 +30,17 @@ function M.new()
 	--audio load
 	local buttonSound1 = audio.loadSound( "button.mp3" )
 	local buttonSound2 = audio.loadSound( "button2.mp3" )
+	local correctSound = audio.loadSound( "correct.wav" )
+	local clearSound = audio.loadSound( "clearSound.wav" )
 	--Sqlite setup
 	local path = system.pathForFile("dictionary.sqlite")
 	local db = sqlite3.open( path ) --remember to close
+
+	--change difficulty for game modes
+	if gameMode == "WallToWall" then
+		currentTime = 35
+		timeCapacity = currentTime
+	end
 
 	local function untouchable ()
 		print("Aint nobody gon touch mah chillen")
@@ -68,6 +76,21 @@ function M.new()
 	--timeBar:setFillColor(52, 152, 219)
 	timeBar:setFillColor(243, 156, 18)
 	timeBar.alpha = topBar.alpha
+
+	local function bgDevTap(event)
+		if event.phase == "began" then
+			physics.stop()
+		end
+	end
+	bg:addEventListener("touch", bgDevTap)
+
+	local function playAudio(audioVar)
+		local audioData = Load("audioData")
+		if audioData.toggle == "on" then
+			audio.play(audioVar)
+		elseif audioData.toggle == "off" then
+		end
+	end
 
 	local function tweet ()
 		local function tweetCallback( event )
@@ -191,9 +214,9 @@ function M.new()
 	local function selectLetter(self, event)
 		if #chosenLetters < 5 then
 			if event.phase == "began" then
-				audio.play(buttonSound1)
+				playAudio(buttonSound1)
 			elseif event.phase == "ended" then
-				audio.play(buttonSound2)
+				playAudio(buttonSound2)
 				local xPos = cw/5
 				local tablePos = #chosenLetters + 1
 				print(tablePos)
@@ -252,10 +275,11 @@ function M.new()
 				transition.to( self.overlay, { time=scaleTime, xScale = 0.01, yScale = 0.01, onComplete = moveToDock } )
 			end
 		end
+		return true
 	end
 
-	local function spawnLetters()
-		local i = math.random(0,4)
+	local function spawnLetters(position)
+		local i = position
 		local letter = math.random(1, 3)
 		local chanceToMultiply = math.random(1, 100)
 		local xPos = cw/5
@@ -309,7 +333,10 @@ function M.new()
 		letterBox.touch = selectLetter
 		letterBox:addEventListener("touch", letterBox)
 	end
-	spawnLetters()
+	if gameMode ~= "WallToWall" then
+		local position = math.random(0, 4)
+		spawnLetters(position)
+	end
 
 	--neatly delete letters
 	local function clearChosenLetter(letter)
@@ -361,6 +388,7 @@ function M.new()
 					local isWordValid = isWordValid(word)
 					print(isWordValid)
 					if isWordValid == true then
+						playAudio(correctSound)
 						print("YOU WIN YOU WINNER!")
 						scoreToAdd = 0
 						--use multipliers
@@ -399,6 +427,9 @@ function M.new()
 					end
 				end
 			else -- if it wasn't a swipe
+				if #chosenLetters > 0 then
+					playAudio(clearSound)
+				end
 				for i = 1, #chosenLetters do 
 					if chosenLetters[i] then
 						local function dealWithLetters()
@@ -433,7 +464,14 @@ function M.new()
 			letterSpawnCooldown = letterSpawnCooldown - 1
 		elseif letterSpawnCooldown <= 0 then
 			letterSpeed = letterSpeed + 1
-			spawnLetters()
+			if gameMode == "Rush" or gameMode == "InfiniFall" then
+				local position = math.random(0, 4)
+				spawnLetters(position)
+			elseif gameMode == "WallToWall" then
+				for i = 0, 4 do
+					spawnLetters(i)
+				end
+			end
 			letterSpawnCooldown = letterSpawnTime
 		end
 		--update score
@@ -442,8 +480,12 @@ function M.new()
 			scoreTxt.text = currentScore
 		end
 		--update time
-		currentTime = currentTime - timeSubtractor
-		updateTimeBar()
+		if gameMode == "Rush" or gameMode == "WallToWall" then
+			currentTime = currentTime - timeSubtractor
+			updateTimeBar()
+		elseif gameMode == "InfiniFall" then
+			--dont subtract timer
+		end
 		if currentTime <= 0.1 then
 			if canDisplayGameOver then
 				canDisplayGameOver = false
