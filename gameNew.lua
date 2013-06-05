@@ -20,7 +20,7 @@ function M.new()
 	local currentTime = 150 -- 150
 	local timeCapacity = currentTime
 	local timeSubtractor = 0.05
-	local doubleChance = 100
+	local doubleChance = 90
 	local canDisplayGameOver = true
 	local swipeStartX
 	local swipeStartY

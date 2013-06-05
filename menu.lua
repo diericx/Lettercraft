@@ -52,6 +52,8 @@ function M.new()
 	audioAnimation.y = 80  --center the sprite vertically
 	audioAnimation:setFrame(1)
 
+	local tutorialBtn = display.newImage(group, "Images/tutorialBtn.png", cw - 140, 20, 100, 100)
+
 	local function updateAudioToggle()
 		local audioData = Load("audioData")
 		print("Audio is...", audioData.toggle)
