@@ -77,13 +77,6 @@ function M.new()
 	timeBar:setFillColor(243, 156, 18)
 	timeBar.alpha = topBar.alpha
 
-	local function bgDevTap(event)
-		if event.phase == "began" then
-			physics.stop()
-		end
-	end
-	bg:addEventListener("touch", bgDevTap)
-
 	local function playAudio(audioVar)
 		local audioData = Load("audioData")
 		if audioData.toggle == "on" then

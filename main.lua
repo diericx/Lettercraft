@@ -9,6 +9,8 @@ display.setStatusBar( display.HiddenStatusBar )
 
 
 --system.setIdleTimer( false ) -- change for nook
+--set game mode
+gameMode = "Rush"
 
 --other stuff
 cw = display.contentWidth
