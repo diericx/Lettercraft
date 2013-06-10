@@ -245,7 +245,7 @@ function M.new()
 							transition.to(chosenLetters[i].letterMultTxt, {x = 1000, onComplete = function() end})	
 						end
 						--add to the score
-						score = score + (scoreToAdd * #chosenLetters)
+						--score = score + (scoreToAdd * #chosenLetters)
 						--scoreTxt.text = currentScore
 						--add to the time
 						currentTime = currentTime + (scoreToAdd * #chosenLetters)

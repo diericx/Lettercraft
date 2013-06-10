@@ -402,15 +402,23 @@ function M.new()
 								transition.to(chosenLetters[i].multTxt, {x = 1000, onComplete = function() clearChosenLetter(chosenLetters[i])end})	
 							end
 						end
-						--add to the score
-						scoreToAdd = scoreToAdd * #chosenLetters
+						--multiplier
 						if multiplier > 0 then
 							scoreToAdd = scoreToAdd * multiplier
 						end
+						--add to the time
+						print("currentTime=", currentTime)
+
+						--add to the score
+						scoreToAdd = scoreToAdd * #chosenLetters
+						currentTime = currentTime + (scoreToAdd*1.5)
+						--print stuff
+						print("Score=",score)
+						print("Score To Add=",scoreToAdd)
+						print("currentTimeAfter=", currentTime)
+						print("timeCapacity=", timeCapacity)
 						score = score + scoreToAdd
 						--scoreTxt.text = currentScore
-						--add to the time
-						currentTime = currentTime + score
 						
 					elseif isWordValid ~= true then 
 						for i = 1, #chosenLetters do 
