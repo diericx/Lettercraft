@@ -20,6 +20,8 @@ function M.new()
 	local currentTime = 150 -- 150
 	local timeCapacity = currentTime
 	local timeSubtractor = 0.05
+	local difficultyTimer = 240
+	local difficultyCooldown = difficultyTimer
 	local doubleChance = 90
 	local canDisplayGameOver = true
 	local swipeStartX
@@ -38,7 +40,7 @@ function M.new()
 
 	--change difficulty for game modes
 	if gameMode == "WallToWall" then
-		currentTime = 35
+		currentTime = 35 --35
 		timeCapacity = currentTime
 	end
 
@@ -86,6 +88,7 @@ function M.new()
 	end
 
 	local function tweet ()
+		print("TWEET!")
 		local function tweetCallback( event )
 		   if ( event.action == "cancelled" ) then
 		      print( "User cancelled" )
@@ -97,7 +100,6 @@ function M.new()
 		local options = {
 		   message = "I got a sweet score of "..score.."in WordForge #wordforge",
 		   listener = tweetCallback,
-		   url = { "http://appdojo.com" }
 		}
 		native.showPopup( "twitter", options )
 	end
@@ -183,9 +185,9 @@ function M.new()
 			end
 			--create buttons and text
 			--social media
-			local twitter = display.newImage(group, "Images/tweet.png", cw/2, ch/2)
-			twitter.x, twitter.y = cw/2, ch/2 - 120
-			twitter:addEventListener("tap", tweet)
+			-- local twitter = display.newImage(group, "Images/tweet.png", cw/2, ch/2)
+			-- twitter.x, twitter.y = cw/2, ch/2 - 120
+			-- twitter:addEventListener("tap", tweet)
 			--pause - quit buttons
 			pausedText = display.newText(group, "Game Over!", 0, 0, "Hiruko", 60)
 			pausedText.x, pausedText.y = cw/2, ch/2-300
@@ -198,6 +200,8 @@ function M.new()
 			resumeButton = displayNewButton(group, "Images/buttonResume.png", "Images/buttonResumeTapped.png", cw/2 - 258, divider.y + 205, false, 1, 0, nil, "Replay", 255, 255, 255, "Hiruko", 50, resume, 1)
 			--Quit Button
 			quitButton = displayNewButton(group, "Images/buttonExit.png", "Images/buttonExitTapped.png", cw/2 - 258, divider.y + 305, false, 1, 0, nil, "Quit", 255, 255, 255, "Hiruko", 50, quit, 1)
+			-- Tweet button
+			tweetBtn = displayNewButton(group, "Images/tweet.png", "Images/tweet.png", cw/2-130, ch/2-155, false, 1, 0, nil, "", 255, 255, 255, "Hiruko", 50, tweet, 1)
 
 		end
 	end
@@ -410,14 +414,17 @@ function M.new()
 						print("currentTime=", currentTime)
 
 						--add to the score
+						if gameMode ~= "WallToWall" then
+							scoreToAdd = scoreToAdd * 1.5
+						end
 						scoreToAdd = scoreToAdd * #chosenLetters
-						currentTime = currentTime + (scoreToAdd*1.5)
+						currentTime = currentTime + scoreToAdd
 						--print stuff
 						print("Score=",score)
 						print("Score To Add=",scoreToAdd)
 						print("currentTimeAfter=", currentTime)
 						print("timeCapacity=", timeCapacity)
-						score = score + scoreToAdd
+						score = score + scoreToAdd + 100
 						--scoreTxt.text = currentScore
 						
 					elseif isWordValid ~= true then 
@@ -464,7 +471,6 @@ function M.new()
 		if letterSpawnCooldown > 0 then
 			letterSpawnCooldown = letterSpawnCooldown - 1
 		elseif letterSpawnCooldown <= 0 then
-			letterSpeed = letterSpeed + 1
 			if gameMode == "Rush" or gameMode == "InfiniFall" then
 				local position = math.random(0, 4)
 				spawnLetters(position)
@@ -477,7 +483,10 @@ function M.new()
 		end
 		--update score
 		if currentScore < score then
-			currentScore = currentScore + 1
+			currentScore = currentScore + 2
+			scoreTxt.text = currentScore
+		elseif currentScore > score then
+			currentScore = score
 			scoreTxt.text = currentScore
 		end
 		--update time
@@ -492,6 +501,24 @@ function M.new()
 				canDisplayGameOver = false
 				endGame()
 			end
+		end
+		--change difficulty (time subtraction amount)
+		if difficultyCooldown > 0 then
+			difficultyCooldown = difficultyCooldown - 1
+		elseif difficultyCooldown <= 0 then
+			-- letterSpeed = letterSpeed + 1
+			print("Change difficulty")
+			if letterSpawnTime > 50 then
+				letterSpawnTime = letterSpawnTime - 1
+			end
+			if letterSpeed < 165 then
+				letterSpeed = letterSpeed + 2.5
+			end
+			--timeSubtractor = timeSubtractor + 0.01
+			for i = 1, letterGroup.numChildren do
+				letterGroup[i]:setLinearVelocity(0, letterSpeed, letterGroup[i].x, letterGroup[i].y)
+			end
+			difficultyCooldown = difficultyTimer
 		end
 	end
 	setEnterFrame(enterFrame)
