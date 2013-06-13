@@ -1,6 +1,5 @@
 local M = {}
 function M.new()
-	require "multiline_text"
 	local group = display.newGroup()
 
 	--check for ser info, if there create header
@@ -160,6 +159,7 @@ function M.new()
 	local rushBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2-300, false, 1, 0, "gameNew", "Rush", 150, 150, 150, "Hiruko", 80, nil, nil)
 	local infiniBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 20, false, 1, 0, "gameNew", "Infini-Fall", 150, 150, 150, "Hiruko", 80, setInfini, nil)
 	local wallToWallBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 180, false, 1, 0, "gameNew", "Wall To Wall", 150, 150, 150, "Hiruko", 68, setWallTWall, nil)
+	local leaderboardsBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 300, false, 1, 0, "leaderboards", "Leaderboards", 150, 150, 150, "Hiruko", 55, nil, nil)
 
 	--group:insert(leaderboardsBtnH)
 	--director:changeScene("game")

@@ -233,6 +233,12 @@ function M.new()
 				end
 				local scaleTime = 140
 				local function moveToDock()
+					--make sure no tiles are moving when they get placed into the dock
+					self:setLinearVelocity(0, 0, self.x, self.y) -- remove any velocity
+					self.overlay:setLinearVelocity(0, 0, self.x, self.y) -- remove any velocity
+					self.text:setLinearVelocity(0, 0, self.x, self.y) -- remove any velocity
+					self.multTxt:setLinearVelocity(0, 0, self.x, self.y) -- remove any velocity
+					self.touch = nil
 					local obj
 					local numbLetterObjs = 4
 					for i = 1, numbLetterObjs do
@@ -424,7 +430,7 @@ function M.new()
 						print("Score To Add=",scoreToAdd)
 						print("currentTimeAfter=", currentTime)
 						print("timeCapacity=", timeCapacity)
-						score = score + scoreToAdd + 100
+						score = math.round(score + scoreToAdd + 100)
 						--scoreTxt.text = currentScore
 						
 					elseif isWordValid ~= true then 
