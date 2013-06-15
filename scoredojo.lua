@@ -58,7 +58,7 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 	local bg = display.newRect(bgGroup, 0, 0, cw, ch)
 	bg:setFillColor(240,240,240)
 	--topBar shit
-	local topBar = display.newImage(group, "scoredojo/topBar.png", 0, -40)
+	local topBar = display.newImage(group, "scoredojo/topBar.png", 0, -100)
 	topBar:scale(1, 0.6)
 
 	local tabs
@@ -75,7 +75,7 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 	end
 
 	--local backBtn = displayNewButton(group, "scoredojo/buttonUpSmall.png", "scoredojo/buttonDownSmall.png", 20, 10, false, 1, nil, "menu", "Back", "Hiruko", 40, removeFields, nil)	
-	local backBtn = displayNewButton(group, "scoredojo/buttonUpSmall.png", "scoredojo/buttonDownSmall.png", 20, 10, false, 1, nil, "menu", "Back", 25, 25, 25, "Hiruko", 40, removeFields, nil)
+	local backBtn = displayNewButton(group, "scoredojo/buttonUpSmall.png", "scoredojo/buttonDownSmall.png", 20, -50, false, 1, nil, "menu", "Back", 25, 25, 25, "Hiruko", 40, removeFields, nil)
 	--------------
 	--functions
 	--------------
@@ -374,7 +374,7 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 	        }
 	    }
 	    tabs = widget.newTabBar{
-	        top=ch-130,
+	        top=ch-50,
 	        height=130,
 	        backgroundFile = "scoredojo/tabbar.png",
 			tabSelectedLeftFile = "scoredojo/tabBar_tabSelectedLeft.png",
@@ -419,21 +419,21 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 					if i == 1 then --if its the first person displayed then...
 						if #table == 1 then -- if theres only 1 person then...
 							print("ONLY 1...")
-							playerRow = display.newImage( "scoredojo/tableSingle.png", 0, 2*114 - 100)
+							playerRow = display.newImage( "scoredojo/tableSingle.png", 0, 1*113 - 100)
 							currentLoaderboardGroup:insert( playerRow )
 						else
-							playerRow = display.newImage( "scoredojo/tableTop.png", 0, i*114 - 100)
+							playerRow = display.newImage( "scoredojo/tableTop.png", 0, i*113 - 100)
 							currentLoaderboardGroup:insert( playerRow )
 						end
 					elseif i == #table then --if its the last person displayed then...
-						playerRow = display.newImage( "scoredojo/tableBot.png", 0, i*114 - 100)
+						playerRow = display.newImage( "scoredojo/tableBot.png", 0, i*113 - 100)
 						currentLoaderboardGroup:insert( playerRow )
 						scrollView:insert(currentLoaderboardGroup)
 					elseif i ~= 1 and i ~= #table then --if its any of the other people displayed then...
-						playerRow = display.newImage( "scoredojo/tableMid.png", 0, i*114 - 100)
+						playerRow = display.newImage( "scoredojo/tableMid.png", 0, i*113 - 100)
 						currentLoaderboardGroup:insert( playerRow )
 					end
-					local playerRankBox = display.newRoundedRect(currentLoaderboardGroup, playerRow.x - 240, playerRow.y - 50, 100, 100, 20)
+					local playerRankBox = display.newRoundedRect(currentLoaderboardGroup, playerRow.x - 220, playerRow.y - 50, 100, 100, 20)
 					playerRankBox:setFillColor(100, 100, 100)
 					playerRankBox.alpha = 0.1
 					local playerRankText = display.newText(currentLoaderboardGroup, i, playerRankBox.x, playerRankBox.y , "Hiruko", 70)
@@ -468,7 +468,7 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 								playerRow.x = cw/2
 								playerRow.y = playerRow.y + 50
 								currentLoaderboardGroup:insert( playerRow )
-								local playerRankBox = display.newRoundedRect(currentLoaderboardGroup, playerRow.x - 265, playerRow.y - 50, 100, 100, 20)
+								local playerRankBox = display.newRoundedRect(currentLoaderboardGroup, playerRow.x - 263, playerRow.y - 50, 100, 100, 20)
 								playerRankBox:setFillColor(100, 100, 100)
 								playerRankBox.alpha = 0.1
 								local playerRankText = display.newText(currentLoaderboardGroup, "", playerRankBox.x, playerRankBox.y , "Hiruko", 70)
@@ -495,6 +495,10 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 										playerScoreText.text = tostring(data.score)
 										return userRankScore
 									else 
+										playerRankText.text = "--"
+										playerScoreText.text = "No score submitted!"
+										playerScoreText.size = 45
+										playerScoreText.x = playerScoreText.x + 164
 									end
 								end
 								--print("getRank()")
@@ -512,21 +516,22 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 					backBtn:toFront()
 					loadingScreenGroup:toFront()
 				end
+				print("CREATED ROWS")
 			else
 				--no people in leaderboard
 				clearGroup(currentLoaderboardGroup)
-				local playerRow = display.newImage( "scoredojo/tableSingle.png", 0, 2*114 - 100)
+				local playerRow = display.newImage( "scoredojo/tableSingle.png", 0, 1*114 - 100)
 				currentLoaderboardGroup:insert( playerRow )
-				local playerRankBox = display.newRoundedRect(currentLoaderboardGroup, playerRow.x - 240, playerRow.y - 50, 100, 100, 20)
+				local playerRankBox = display.newRoundedRect(currentLoaderboardGroup, playerRow.x - 220, playerRow.y - 50, 100, 100, 20)
 				playerRankBox:setFillColor(100, 100, 100)
 				playerRankBox.alpha = 0.1
 				local playerRankText = display.newText(currentLoaderboardGroup, "0", playerRankBox.x, playerRankBox.y , "Hiruko", 70)
 				playerRankText.x, playerRankText.y = playerRankBox.x, playerRankBox.y
 				playerRankText:setTextColor(199, 147, 22)
-				local playerNameText = display.newText(currentLoaderboardGroup, "There's no one here!", playerRankBox.x + 75, 0, "Hiruko", 35)
+				local playerNameText = display.newText(currentLoaderboardGroup, "There's no one here!", playerRankBox.x + 75, playerRankBox.y, "Hiruko", 35)
 				playerNameText:setTextColor(100, 100, 100)
 				playerNameText.y = playerRow.y - 30
-				local playerScoreText = display.newText(currentLoaderboardGroup, "Be the first one!", playerRankBox.x + 75, 0, "Hiruko", 50)
+				local playerScoreText = display.newText(currentLoaderboardGroup, "Be the first one!", playerRankBox.x + 75, playerRankBox.y, "Hiruko", 50)
 				playerScoreText:setTextColor(199, 147, 22)
 				playerScoreText.y = playerRow.y + 25
 				--add them to a new scrollView
@@ -653,10 +658,10 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 	    }
 	    tabs = widget.newTabBar{
 	    	height=130,
-	        top=ch-130,
-	       	backgroundFile = "scoredojo/scoredojo/scoredojo/scoredojo/tabbar.png",
-			tabSelectedLeftFile = "scoredojo/scoredojo/scoredojo/tabBar_tabSelectedLeft.png",
-			tabSelectedMiddleFile = "scoredojo/scoredojo/tabBar_tabSelectedMiddle.png",
+	        top=ch-75,
+	       	backgroundFile = "scoredojo/tabbar.png",
+			tabSelectedLeftFile = "scoredojo/tabBar_tabSelectedLeft.png",
+			tabSelectedMiddleFile = "scoredojo/tabBar_tabSelectedMiddle.png",
 			tabSelectedRightFile = "scoredojo/tabBar_tabSelectedRight.png",
 			tabSelectedFrameWidth = 20,
 			tabSelectedFrameHeight = 120,
@@ -667,7 +672,7 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 	    loadingScreenGroup:toFront()
 
 	    --topBar shit
-	    local topBar = display.newImage(topBarGroup, "scoredojo/topBar.png", 0, -40)
+	    local topBar = display.newImage(topBarGroup, "scoredojo/topBar.png", 0, -100)
 	    topBar:scale(1, 0.6)
 
 		--local backBtn = displayNewButton(topBarGroup, "Images/buttonUpSmall.png", "Images/buttonDownSmall.png", 20, 10, false, 1, nil, "menu", "Back", "Hiruko", 40, nil, nil)	

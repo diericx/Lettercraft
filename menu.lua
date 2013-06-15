@@ -14,8 +14,7 @@ function M.new()
 
 	-- local bg = display.newRect(group, 0, 0, cw, ch)
 	-- bg:setFillColor(250, 250, 250)
-	local bg = display.newImage(group, "Images/bg2.png", 10, 0)
-	bg:scale(1.2, 1)
+	displayBackground(group)
 
 	local multiLineText = display.newMultiLineText  
         {
@@ -156,11 +155,51 @@ function M.new()
 		gameMode="WallToWall"
 	end
 
-	local rushBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2-300, false, 1, 0, "gameNew", "Rush", 150, 150, 150, "Hiruko", 80, nil, nil)
-	local infiniBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 20, false, 1, 0, "gameNew", "Infini-Fall", 150, 150, 150, "Hiruko", 80, setInfini, nil)
-	local wallToWallBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 180, false, 1, 0, "gameNew", "Wall To Wall", 150, 150, 150, "Hiruko", 68, setWallTWall, nil)
-	local leaderboardsBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, cw/2 + 300, false, 1, 0, "leaderboards", "Leaderboards", 150, 150, 150, "Hiruko", 55, nil, nil)
+	local rushBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 - 300, false, 1, 0, "gameNew", "Rush", 150, 150, 150, "Hiruko", 80, nil, nil)
+	local infiniBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 - 150, false, 1, 0, "gameNew", "Infini-Fall", 150, 150, 150, "Hiruko", 80, setInfini, nil)
+	local wallToWallBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 , false, 1, 0, "gameNew", "Wall To Wall", 150, 150, 150, "Hiruko", 68, setWallTWall, nil)
 
+	-- move things according to device
+	local modelName = findModel()
+	if modelName == "Nook" or modelName == "iPhone5" or modelName == "Macbook" then
+
+		print("DIF MODEL!")
+		local yDif = 50
+		rushBtn.y = rushBtn.y - yDif
+		infiniBtn.y = infiniBtn.y - yDif
+		wallToWallBtn.y = wallToWallBtn.y - yDif
+		-- tut and sound btns
+		tutorialBtn.y = tutorialBtn.y - yDif
+		tutorialBtnD.y = tutorialBtnD.y - yDif
+		tutorialBtnOverlay.y = tutorialBtnOverlay.y - yDif
+		soundBtn.y = soundBtn.y - yDif
+		soundBtnD.y = soundBtnD.y - yDif
+		soundBtnOutline.y = soundBtnOutline.y - yDif
+		soundBtnOutlineD.y = soundBtnOutlineD.y - yDif
+		soundOverlay.y = soundOverlay.y - yDif
+
+		-- more specifics
+		if modelName == "Nook" or modelName == "Macbook" then
+			-- create the leaderboard btn
+			local leaderboardsBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 + 100, false, 1, 0, "leaderboards", "Leaderboards", 150, 150, 150, "Hiruko", 55, nil, nil)
+
+		elseif modelName == "iPhone5" then
+			-- move mail down a bit more
+			mail.y = mail.y + yDif
+			multiLineText.y = multiLineText.y + yDif
+			-- move the sound up a bit more
+			local soundExtraDif = -25
+			soundBtn.y = soundBtn.y + soundExtraDif 
+			soundBtnD.y = soundBtnD.y   + soundExtraDif
+			soundBtnOutline.y = soundBtnOutline.y   + soundExtraDif
+			soundBtnOutlineD.y = soundBtnOutlineD.y   + soundExtraDif
+			soundOverlay.y = soundOverlay.y  + soundExtraDif
+			-- move the tut btns up a bit more
+			tutorialBtn.y = tutorialBtn.y + soundExtraDif
+			tutorialBtnD.y = tutorialBtnD.y + soundExtraDif
+			tutorialBtnOverlay.y = tutorialBtnOverlay.y + soundExtraDif
+		end
+	end
 	--group:insert(leaderboardsBtnH)
 	--director:changeScene("game")
 

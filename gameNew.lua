@@ -14,6 +14,7 @@ function M.new()
 	--variables
 	local score = 0
 	local currentScore = score 
+	local letterSpawnY = -100
 	local letterSpeed = 115
 	local letterSpawnTime = 70
 	local letterSpawnCooldown = letterSpawnTime
@@ -49,8 +50,7 @@ function M.new()
 		return true
 	end
 
-	local bg = display.newImage(group, "Images/bg2.png", 10, 0)
-	bg:scale(1.2, 1)
+	local bg = displayBackground(group)
 
 	local botBar = display.newImage(group, "Images/bar.png", 0, ch - 123)
 	botBar:setFillColor(200, 200, 200)
@@ -78,6 +78,19 @@ function M.new()
 	--timeBar:setFillColor(52, 152, 219)
 	timeBar:setFillColor(243, 156, 18)
 	timeBar.alpha = topBar.alpha
+
+	-- move stuff according to device
+	local modelName = findModel()
+	if modelName == "Nook" or modelName == "iPhone5" or modelName == "Macbook" then
+		local yDif = 66
+		letterSpawnY = letterSpawnY - 50
+		topBar.y = topBar.y - yDif
+		deleteBar.y = deleteBar.y + 60
+		menuButton.y = menuButton.y - yDif
+		timeBar.y = timeBar.y - yDif
+		scoreTxt.y = scoreTxt.y - yDif
+		botBar.y = botBar.y + yDif
+	end
 
 	local function playAudio(audioVar)
 		local audioData = Load("audioData")
@@ -120,6 +133,11 @@ function M.new()
 		end
 		timeBar.x = timeBar.width/2--timeCapacity*timeBar.xScale
 	end
+
+	local function removeLetter(event)
+		display.remove(event.other)
+	end
+	deleteBar:addEventListener("collision", removeLetter)
 
 	local function menu(option)
 		local pausedText
@@ -291,7 +309,7 @@ function M.new()
 		local letterBox = display.newRect(letterGroup, 0, 0, cw/5 - 10, cw/5)
 		letterBox:setFillColor(220, 220, 220)
 		letterBox.strokeWidth = 4
-		letterBox.x, letterBox.y = i*xPos + ((letterBox.width)/2) + 5, -100
+		letterBox.x, letterBox.y = i*xPos + ((letterBox.width)/2) + 5, letterSpawnY
 		letterBox.value = randomLetter.value
 		letterBox.multiplier = 1
 		physics.addBody(letterBox, {isSensor = true, density = 5})
