@@ -83,6 +83,7 @@ function M.new()
 	local modelName = findModel()
 	if modelName == "Nook" or modelName == "iPhone5" or modelName == "Macbook" then
 		local yDif = 66
+		local extraYDif = 22
 		letterSpawnY = letterSpawnY - 50
 		topBar.y = topBar.y - yDif
 		deleteBar.y = deleteBar.y + 60
@@ -90,6 +91,13 @@ function M.new()
 		timeBar.y = timeBar.y - yDif
 		scoreTxt.y = scoreTxt.y - yDif
 		botBar.y = botBar.y + yDif
+		if modelName == "iPhone5" then
+			topBar.y = topBar.y - extraYDif
+			menuButton.y = menuButton.y - extraYDif
+			timeBar.y = timeBar.y - extraYDif
+			scoreTxt.y = scoreTxt.y - extraYDif
+			botBar.y = botBar.y + extraYDif
+		end
 	end
 
 	local function playAudio(audioVar)
@@ -144,11 +152,12 @@ function M.new()
 		local divider
 		local resumeButton
 		local quitButton
-		local fade = display.newRect(group, 0,0, cw,ch)
+		local fade = display.newRect(group, 0,0- 250, cw,ch + 500)
 		fade:addEventListener("touch", untouchable)
 		fade:addEventListener("tap", untouchable)
 		fade:setFillColor(0,0,0)
 		fade.alpha = 0.6
+		-- change fade size according to device
 		if option == "menu" then
 			setEnterFrame(nil)
 			physics.pause()
