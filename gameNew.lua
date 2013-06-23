@@ -20,7 +20,7 @@ function M.new()
 	local letterSpawnCooldown = letterSpawnTime
 	local currentTime = 150 -- 150
 	local timeCapacity = currentTime
-	local timeSubtractor = 0.05
+	local timeSubtractor = 0.08
 	local difficultyTimer = 240
 	local difficultyCooldown = difficultyTimer
 	local doubleChance = 90
@@ -125,6 +125,17 @@ function M.new()
 		native.showPopup( "twitter", options )
 	end
 
+	local function pulseObj(obj, scaleAmount, time)
+		local pulseDown
+		local function pulseUp ( )
+			transition.to(obj, {xScale= obj.xScale + scaleAmount, yScale = obj.yScale + scaleAmount, time=time, onComplete = pulseDown})
+		end
+		pulseDown = function ( )
+			transition.to(obj, {xScale = obj.xScale - scaleAmount, yScale = obj.yScale - scaleAmount, time=time, onComplete = pulseUp})
+		end
+		pulseDown()
+	end
+
 	--update size of time bar
 	local function updateTimeBar () 
 		--change size of time bar
@@ -211,10 +222,11 @@ function M.new()
 				director:changeScene("menu", "crossfade")
 			end
 			--create buttons and text
-			--social media
-			-- local twitter = display.newImage(group, "Images/tweet.png", cw/2, ch/2)
-			-- twitter.x, twitter.y = cw/2, ch/2 - 120
-			-- twitter:addEventListener("tap", tweet)
+			--appcano ad
+			local appcanoAdd = display.newImage(group, "Images/appcanoAd.png", 0, 0)
+			appcanoAdd.x, appcanoAdd.y = cw/2-2, ch/2 + 225
+			appcanoAdd:scale(0.9, 0.9)
+			pulseObj(appcanoAdd, 0.05, 500)
 			--pause - quit buttons
 			pausedText = display.newText(group, "Game Over!", 0, 0, "Hiruko", 60)
 			pausedText.x, pausedText.y = cw/2, ch/2-300
@@ -392,7 +404,8 @@ function M.new()
 
 	--swipe function
 	local function dockListener (event)
-		local swipe = false
+		local swipeR = false
+		local swipeL = false
 		if event.phase == "began" then
 			--log the start touch position
 			swipeStartX = event.x
@@ -402,14 +415,19 @@ function M.new()
 			swipeEndX = event.x
 			swipeEndY = event.y 
 			local xDif = swipeEndX - swipeStartX
+			print(xDif)
 			--find end x and end y and see if it was a swipe
-			if swipeStartX < swipeEndX and xDif > 50 then -- check X for swipe
-				--if startY == (endY+20) or startY == (endY-20) then
-					swipe = true
-					print("WAS A SWIPE!!!")
-				--end
+			if swipeStartX < swipeEndX and xDif > 40 then -- check X for swipe
+				-- swipe right
+				swipeR = true
+				print("WAS A SWIPE!!!")
+			elseif swipeStartX > swipeEndX and xDif < -40 then
+				-- swipe left
+				swipeL = true
+				print("WAS A SWIPE!!!")
 			end
-			if swipe then --if it was a swipe then check if it is valid
+
+			if swipeR or swipeL then --if it was a swipe then check if it is valid
 				--if there is no word highlight the box
 				if word == nil then 
 					print("Make a word first!")
@@ -430,9 +448,15 @@ function M.new()
 							end
 							scoreToAdd = scoreToAdd + chosenLetters[i].value
 							scoreTxt.text = score
-							transition.to(chosenLetters[i], {x = 1000, onComplete = function() end})
-							transition.to(chosenLetters[i].text, {x = 1000, onComplete = function() end})
-							transition.to(chosenLetters[i].overlay, {x = 1000, onComplete = function() end})	
+							local goToX = 0
+							if swipeR == true then
+								goToX = 1000
+							elseif swipeL == true then
+								goToX = -500
+							end
+							transition.to(chosenLetters[i], {x = goToX, onComplete = function() end})
+							transition.to(chosenLetters[i].text, {x = goToX, onComplete = function() end})
+							transition.to(chosenLetters[i].overlay, {x = goToX, onComplete = function() end})	
 							if i == #chosenLetters then
 								transition.to(chosenLetters[i].multTxt, {x = 1000, onComplete = function() clearChosenLetter(chosenLetters[i]) word = "" chosenLetters = {} end})	
 							else 

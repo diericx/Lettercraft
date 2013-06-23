@@ -25,8 +25,6 @@ device = {
 
 }
 
-print(device.model, "device model")
-
 alphabet = {
 	{letter="A", value=1}, {letter="B", value=3}, {letter="C", value=3}, {letter="D", value=2}, {letter="E", value=1}, 
 	{letter="F", value=4}, {letter="G", value=2}, {letter="H", value=4}, {letter="I", value=1}, {letter="J", value=8}, 
@@ -81,15 +79,17 @@ function findModel ()
 
 	if device.model == "BNTV200a" or device.model == "BNTV200" or device.model == "BNTV250" or device.model == "BNTV250a" or device.model == "BNTV400" or device.model == "BNTV600" then
 		deviceModelName = "Nook"
-	elseif device.model == "A1428" or device.model == "A1429" or device.model == "A1442" or device.model == "iPhone"  then
+	elseif device.model == "A1428" or device.model == "A1429" or device.model == "A1442" then
 		deviceModelName = "iPhone5"
-	elseif device.model == "A1387" or device.model == "A1431" or device.model == "A1349" or device.model == "A1332" or device.model == "A1325" or device.model == "A1303" or device.model == "A1324" or device.model == "A1241" or device.model == "A1203" then
+	elseif device.model == "A1387" or device.model == "A1431" or device.model == "A1349" or device.model == "A1332" or device.model == "A1325" or device.model == "A1303" or device.model == "A1324" or device.model == "A1241" or device.model == "A1203" or device.model == "iPhone" then
 		deviceModelName = "iPhoneBelow5"
 	elseif device.model == "BNRV200" then
 		deviceModelName = "Macbook"
 	end
 	return deviceModelName
 end
+
+print("deviceModel: ", device.model, "findModel: ", findModel())
 
 function displayBackground(group)
 	local deviceModel = findModel()

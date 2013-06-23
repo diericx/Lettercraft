@@ -14,7 +14,7 @@ function M.new()
 
 	-- local bg = display.newRect(group, 0, 0, cw, ch)
 	-- bg:setFillColor(250, 250, 250)
-	displayBackground(group)
+	local bg = displayBackground(group)
 
 	local multiLineText = display.newMultiLineText  
         {
@@ -28,11 +28,77 @@ function M.new()
         }
         multiLineText.x = cw/2
 
-	local mail = display.newImage(group, "Images/mail.png", -100, 0)
-	mail:setReferencePoint( display.CenterReferencePoint )
-	mail.x = cw/2 + 10
-	mail.y = ch - 135
-	mail:scale(0.8,0.8)
+	-- local mail = display.newImage(group, "Images/mail.png", -100, 0)
+	-- mail:setReferencePoint( display.CenterReferencePoint )
+	-- mail.x = cw/2 + 10
+	-- mail.y = ch - 135
+	-- mail:scale(0.8,0.8)
+
+	local mail = displayNewButton(group, "Images/mail.png", nil, cw/2 - 100, ch - 335, true, 0.8, 0, "gameNew", "", 150, 150, 150, "Hiruko", 80, nil, nil)
+	mail.x, mail.y = cw/2 - 100, ch - 240
+	local function thanksPopListener( event )
+	        if "clicked" == event.action then
+	                local i = event.index
+	                if 1 == i then -- No
+	                	print("rate")
+	                elseif 2 == i then -- Yes
+	                	print("Remind me")
+	                elseif 3 == i then -- Yes
+	                	print("no thanks")
+	                	local menuCount = Load("menuCount")
+	                	menuCount.shouldDisplayPopup = false
+	                	Save(menuCount, "menuCount")
+	                end
+	        end
+	end
+
+	-- ask for feedback every once in a while
+	-- feedback popup listener
+	-- Handler that gets notified when the alert closes
+	local doYouLoveAlert
+	local thanksAlert
+	local function popupListener( event )
+	        if "clicked" == event.action then
+	                local i = event.index
+	                if 1 == i then -- No
+	                	local options =
+						{
+						   to = "appdojostudios@gmail.com",
+						   subject = "Give Feedback",
+						   body = ""
+						}
+						native.showPopup("mail", options)
+	                        --system.openURL( "http://developer.anscamobile.com" )	                		
+	                        -- Do nothing; dialog will simply dismiss
+	                elseif 2 == i then -- Yes
+	                	print("Rate")
+	                	-- native.cancelAlert(doYouLoveAlert)
+	                	local thanksTxt = "We are so happy to hear that you love Lettercraft! It'd be really helpful if you rated us in the App Store."
+	                	thanksAlert = native.showAlert( "Thank you!", thanksTxt, { "Rate Lettercraft", "Remind Me Later", "No Thanks" }, thanksPopListener )
+	                        -- Open URL if "Learn More" (the 2nd button) was clicked
+	                end
+	        end
+	end
+
+	local menuCount = Load("menuCount")
+	-- if its not there, create one
+	if menuCount == nil then
+		menuCount = {count = 0, top = 5, shouldDisplayPopup = true}
+		Save(menuCount, "menuCount")
+	-- if it is there, add to it
+	elseif menuCount.shouldDisplayPopup == true then
+		if menuCount.count < menuCount.top then
+			menuCount.count = menuCount.count + 1
+			Save(menuCount, "menuCount")
+		-- if it equals the top then display popup
+		elseif menuCount.count == menuCount.top then
+			menuCount.count = 0
+			Save(menuCount, "menuCount")
+			--display a popup
+			-- Show alert with five buttons
+			doYouLoveAlert = native.showAlert( "Do you love Lettercraft?", "", { "No", "Yes" }, popupListener )
+		end
+	end
 
 	-- local sheetData = { width=256, height=256, numFrames=2, sheetContentWidth=512, sheetContentHeight=256 }
 	 
@@ -161,7 +227,7 @@ function M.new()
 
 	-- move things according to device
 	local modelName = findModel()
-	if modelName == "Nook" or modelName == "iPhone5" or modelName == "Macbook" then
+	if modelName == "Nook" or modelName == "iPhone5" or modelName == "iPhoneBelow5" or modelName == "Macbook" then
 
 		print("DIF MODEL!")
 		local yDif = 50
@@ -173,7 +239,7 @@ function M.new()
 		tutorialBtnD.y = tutorialBtnD.y - yDif
 		tutorialBtnOverlay.y = tutorialBtnOverlay.y - yDif
 		soundBtn.y = soundBtn.y - yDif
-		soundBtnD.y = soundBtnD.y - yDif
+		soundBtnD.y = soundBtnD.y - yDif 
 		soundBtnOutline.y = soundBtnOutline.y - yDif
 		soundBtnOutlineD.y = soundBtnOutlineD.y - yDif
 		soundOverlay.y = soundOverlay.y - yDif
@@ -184,6 +250,8 @@ function M.new()
 			local leaderboardsBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 + 100, false, 1, 0, "leaderboards", "Leaderboards", 150, 150, 150, "Hiruko", 55, nil, nil)
 
 		elseif modelName == "iPhone5" then
+			-- move bg
+			bg.y = bg.y - 50
 			-- move mail down a bit more
 			mail.y = mail.y + yDif
 			multiLineText.y = multiLineText.y + yDif
@@ -198,6 +266,17 @@ function M.new()
 			tutorialBtn.y = tutorialBtn.y + soundExtraDif
 			tutorialBtnD.y = tutorialBtnD.y + soundExtraDif
 			tutorialBtnOverlay.y = tutorialBtnOverlay.y + soundExtraDif
+		elseif modelName == "iPhoneBelow5" then
+			local bellow5Dif = 35
+			soundBtn.y = soundBtn.y + bellow5Dif 
+			soundBtnD.y = soundBtnD.y   + bellow5Dif
+			soundBtnOutline.y = soundBtnOutline.y   + bellow5Dif
+			soundBtnOutlineD.y = soundBtnOutlineD.y   + bellow5Dif
+			soundOverlay.y = soundOverlay.y  + bellow5Dif
+			-- move the tut btns up a bit more
+			tutorialBtn.y = tutorialBtn.y + bellow5Dif
+			tutorialBtnD.y = tutorialBtnD.y + bellow5Dif
+			tutorialBtnOverlay.y = tutorialBtnOverlay.y + bellow5Dif
 		end
 	end
 	--group:insert(leaderboardsBtnH)

@@ -7,7 +7,7 @@ function M.new()
 	local score = 0
 	local currentScore = score
 	local currentTime = 150 -- 150
-	local timeSubtractor = 0.05
+	local timeSubtractor = 0.05 -- 0.05
 	local letterSpeed = 115
 	local canDisplayGameOver = true
 	local timeCapacity = currentTime
@@ -33,9 +33,9 @@ function M.new()
 
 	--change settings according to game mode
 	if gameMode == "WallToWall" then
-		currentTime = 140
+		currentTime = 140 -- 140
 		timeCapacity = currentTime
-		timeSubtractor = 0.1
+		timeSubtractor = 0.1 -- 0.1
 	end
 
 	local function untouchable ()
@@ -174,6 +174,10 @@ function M.new()
 				director:changeScene("menu", "crossfade")
 			end
 			--create buttons and text
+			--appcano ad
+			local appcanoAdd = display.newImage(guiGroup, "Images/appcanoAd.png", 0, 0)
+			appcanoAdd.x, appcanoAdd.y = cw/2, ch/2
+			--buttons
 			pausedText = display.newText(guiGroup, "Game Over!", 0, 0, "Hiruko", 60)
 			pausedText.x, pausedText.y = cw/2, ch/2-300
 			divider = display.newRect(guiGroup, 0, 0, cw-250, 5)
