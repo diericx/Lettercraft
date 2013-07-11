@@ -6,6 +6,9 @@ require "multiline_text"
 local onEnterFrame = false
 local lastTime = system.getTimer()
 
+token = "0295e83b1031e2412ef0cc26045b2366"
+baseLink = "https://scoredojo.com/api/v1/"
+
 display.setStatusBar( display.HiddenStatusBar )
 
 
@@ -77,8 +80,10 @@ function findModel ()
 
 	deviceModelName = ""
 
-	if device.model == "BNTV200a" or device.model == "BNTV200" or device.model == "BNTV250" or device.model == "BNTV250a" or device.model == "BNTV400" or device.model == "BNTV600" then
+	if device.model == "BNTV200a" or device.model == "BNTV200" or device.model == "BNTV250" or device.model == "BNTV250a" then 
 		deviceModelName = "Nook"
+	elseif device.model == "BNTV400" or device.model == "BNTV600" then
+		deviceModelName = "NookHD"
 	elseif device.model == "A1428" or device.model == "A1429" or device.model == "A1442" then
 		deviceModelName = "iPhone5"
 	elseif device.model == "A1387" or device.model == "A1431" or device.model == "A1349" or device.model == "A1332" or device.model == "A1325" or device.model == "A1303" or device.model == "A1324" or device.model == "A1241" or device.model == "A1203" or device.model == "iPhone" then

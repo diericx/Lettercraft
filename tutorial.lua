@@ -12,8 +12,14 @@ function M.new()
 	local letterGroup = display.newGroup()
 	group:insert(letterGroup)
 
-	local bg = display.newImage(group, "Images/bg2.png", 10, 0)
-	bg:scale(1.2, 1)
+	local bg = displayBackground(group)
+
+	local modelName = findModel()
+	if modelName == "Nook" or modelName == "iPhone5" or modelName == "Macbook" or modelName == "NookHD" then
+		local yDif = 87
+		local extraYDif = 22
+		bg.y = bg.y - yDif
+	end
 
 	local getStartedBtn = display.newImage(group, "Images/tutGetStarted.png", 0, 0)
 	getStartedBtn.x, getStartedBtn.y = cw/2, ch - 100

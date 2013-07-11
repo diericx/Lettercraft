@@ -33,6 +33,8 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 	local loadingScreenGroup = display.newGroup()
 	group:insert(loadingScreenGroup)
 
+	local table
+
 	local userInfoTemp
 	local topBoundary = display.screenOriginY
 	local bottomBoundary = display.screenOriginY
@@ -65,6 +67,13 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 
 
 	local function removeFields()
+		day = {}
+		day.name = "day"
+		week = {}
+		week.name = "week"
+		allTime = {}
+		allTime.name = "allTime"
+		table = {}
 		native.setKeyboardFocus( nil )
 		display.remove(emailField)
 		display.remove(passwordField)
@@ -76,11 +85,17 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 
 	--local backBtn = displayNewButton(group, "scoredojo/buttonUpSmall.png", "scoredojo/buttonDownSmall.png", 20, 10, false, 1, nil, "menu", "Back", "Hiruko", 40, removeFields, nil)	
 	local backBtn = displayNewButton(group, "scoredojo/buttonUpSmall.png", "scoredojo/buttonDownSmall.png", 20, -50, false, 1, nil, "menu", "Back", 25, 25, 25, "Hiruko", 40, removeFields, nil)
+	
+    if findModel() == "NookHD" then
+    	topBar.y = topBar.y + 50
+    	backBtn.y = backBtn.y + 55
+    end
+
 	--------------
 	--functions
 	--------------
 	local function displayLoadingScreen(group, y)
-		local loadingScreen = display.newRect(loadingScreenGroup, 0, 0, cw, ch)
+		local loadingScreen = display.newRect(loadingScreenGroup, 0, -100, cw, ch+200)
 		loadingScreen:setFillColor(0,0,0)
 		loadingScreen.alpha = 0.5
 		local loadingText = display.newText(loadingScreenGroup, "Loading...", cw/2, ch/2 , "Hiruko", 60)
@@ -242,7 +257,7 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 	    usernameField.name = "username"
 	    createdByTabGroup:insert(usernameField)
 
-	    usernameFieldTxt = display.newText("Nickname:", usernameField.x-usernameField.width, usernameField.y, native.systemFont, 40)
+	    usernameFieldTxt = display.newText("Username:", usernameField.x-usernameField.width, usernameField.y, native.systemFont, 40)
 	    usernameFieldTxt:setTextColor(150,150,150)
 	    usernameFieldTxt.x = usernameField.x-usernameField.width+25
 	    usernameFieldTxt.y = usernameField.y-5
@@ -321,12 +336,6 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 	--if alreadyLoggedIn is false or true, register or display leaderboards
 	if alreadyLoggedIn == false then
 		--create text at top
-		device = {
-
-			name = system.getInfo("name"),
-			model = system.getInfo("model"),
-
-		}
 		-- local text = display.newText( "You need to login or create a Scoredojo account to view highscores!", 0, 0, cw, 200, "Hiruko", 33 )
 	 --    text.x, text.y = cw/2 + 23, 200
 	 --    if tostring(device.model) == "BNTV250" then
@@ -385,6 +394,10 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 	        buttons=tabButtons,
 	    }
 
+	    if findModel() == "NookHD" or findModel() ==  "Macbook" then
+			tabs.y = tabs.y - 80
+	    end
+
 	    group:insert(tabs)
 
 	    register()
@@ -392,6 +405,8 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 		local topBarGroup = display.newGroup()
 		group:insert(currentLoaderboardGroup)
 		group:insert(topBarGroup)
+		topBarGroup:insert(topBar)
+		topBarGroup:insert(backBtn)
 		--scrollView:insert(currentLoaderboardGroup)
 		
 
@@ -419,18 +434,19 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 					if i == 1 then --if its the first person displayed then...
 						if #table == 1 then -- if theres only 1 person then...
 							print("ONLY 1...")
-							playerRow = display.newImage( "scoredojo/tableSingle.png", 0, 1*113 - 100)
+							playerRow = display.newImage( "scoredojo/tableSingle.png", 0, 1*113 - 80)
 							currentLoaderboardGroup:insert( playerRow )
 						else
-							playerRow = display.newImage( "scoredojo/tableTop.png", 0, i*113 - 100)
+							print("NO TABLE")
+							playerRow = display.newImage( "scoredojo/tableTop.png", 0, i*113 - 80)
 							currentLoaderboardGroup:insert( playerRow )
 						end
 					elseif i == #table then --if its the last person displayed then...
-						playerRow = display.newImage( "scoredojo/tableBot.png", 0, i*113 - 100)
+						playerRow = display.newImage( "scoredojo/tableBot.png", 0, i*113 - 80)
 						currentLoaderboardGroup:insert( playerRow )
 						scrollView:insert(currentLoaderboardGroup)
 					elseif i ~= 1 and i ~= #table then --if its any of the other people displayed then...
-						playerRow = display.newImage( "scoredojo/tableMid.png", 0, i*113 - 100)
+						playerRow = display.newImage( "scoredojo/tableMid.png", 0, i*113 - 80)
 						currentLoaderboardGroup:insert( playerRow )
 					end
 					local playerRankBox = display.newRoundedRect(currentLoaderboardGroup, playerRow.x - 220, playerRow.y - 50, 100, 100, 20)
@@ -464,7 +480,7 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 								local userInfo = Load("userInfo")
 								--put one at bottom for guy if he isn't in top 10
 								--print("ONLY 1")
-								playerRow = display.newImage( "scoredojo/tableSingle.png", 22, i*114 - 100)
+								playerRow = display.newImage( "scoredojo/tableSingle.png", 22, i*114 - 80)
 								playerRow.x = cw/2
 								playerRow.y = playerRow.y + 50
 								currentLoaderboardGroup:insert( playerRow )
@@ -482,8 +498,8 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 								playerScoreText.y = playerRow.y + 25
 
 								playerRow:setFillColor(220,220,255)
-								local divider = display.newRoundedRect(currentLoaderboardGroup, 0, 0, cw-50, 10, 4)
-								divider.x, divider.y = cw/2, playerRow.y - 80
+								local divider = display.newRoundedRect(currentLoaderboardGroup, 0, 0, cw-60, 10, 4)
+								divider.x, divider.y = cw/2, playerRow.y - 82
 								divider:setFillColor(220,220,220)
 
 								--get users rank and score
@@ -491,9 +507,12 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 								local function networkCallback (event)
 									local data = json.decode(event.response)
 									if data.success == true then
-										playerRankText.text = tostring(data.rank)
-										playerScoreText.text = tostring(data.score)
-										return userRankScore
+										if data.rank == 1 or data.rank == 2 or data.rank == 3 or data.rank == 4 or data.rank == 5 or data.rank == 6 or data.rank == 7 or data.rank == 8 or data.rank == 9 or data.rank == 10 then
+											playerRankText.text = tostring(data.rank)
+											playerScoreText.text = "Your in the top 10!"
+											playerScoreText.x = playerScoreText.x + 165
+											return userRankScore
+										end
 									else 
 										playerRankText.text = "--"
 										playerScoreText.text = "No score submitted!"
@@ -520,7 +539,7 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 			else
 				--no people in leaderboard
 				clearGroup(currentLoaderboardGroup)
-				local playerRow = display.newImage( "scoredojo/tableSingle.png", 0, 1*114 - 100)
+				local playerRow = display.newImage( "scoredojo/tableSingle.png", 0, 1*114 - 80)
 				currentLoaderboardGroup:insert( playerRow )
 				local playerRankBox = display.newRoundedRect(currentLoaderboardGroup, playerRow.x - 220, playerRow.y - 50, 100, 100, 20)
 				playerRankBox:setFillColor(100, 100, 100)
@@ -669,13 +688,22 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 	    }
 	    group:insert(tabs)
 
+	    if findModel() == "NookHD" then
+	    	tabs.y = tabs.y - 65
+	    end
+
 	    loadingScreenGroup:toFront()
 
 	    --topBar shit
-	    local topBar = display.newImage(topBarGroup, "scoredojo/topBar.png", 0, -100)
-	    topBar:scale(1, 0.6)
+	    -- local topBar = display.newImage(topBarGroup, "scoredojo/topBar.png", 0, -100)
+	    -- topBar:scale(1, 0.6)
+
+	    -- if findModel() == "NookHD" or findModel() ==  "Macbook" then
+	    -- 	topBar.y = topBar.y + 50
+	    -- end
 
 		--local backBtn = displayNewButton(topBarGroup, "Images/buttonUpSmall.png", "Images/buttonDownSmall.png", 20, 10, false, 1, nil, "menu", "Back", "Hiruko", 40, nil, nil)	
+		topBarGroup:toFront()
 		backBtn:toFront()
 		loadingScreenGroup:toFront()
 	end

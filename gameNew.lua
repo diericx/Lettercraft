@@ -2,6 +2,7 @@ local M = {}
 
 function M.new()
 	physics = require "physics"
+	scoredojo = require "scoredojo"
 	physics.start()
 	physics.setGravity(0,0)
 	sqlite3 = require "sqlite3"
@@ -41,8 +42,13 @@ function M.new()
 
 	--change difficulty for game modes
 	if gameMode == "WallToWall" then
-		currentTime = 35 --35
+		token = "3d59539700c3cdc77c43d3b3e415891d"
+		currentTime = 105 --45
 		timeCapacity = currentTime
+	elseif gameMode == "Rush" then
+		token = "0295e83b1031e2412ef0cc26045b2366"
+	elseif gameMode == "InfiniFall" then
+		token = "f95822abccd7daa4928babac186796a8"
 	end
 
 	local function untouchable ()
@@ -81,9 +87,10 @@ function M.new()
 
 	-- move stuff according to device
 	local modelName = findModel()
-	if modelName == "Nook" or modelName == "iPhone5" or modelName == "Macbook" then
-		local yDif = 66
+	if modelName == "Nook" or modelName == "iPhone5" or modelName == "Macbook" or modelName == "NookHD" then
+		local yDif = 87
 		local extraYDif = 22
+		bg.y = bg.y - yDif
 		letterSpawnY = letterSpawnY - 50
 		topBar.y = topBar.y - yDif
 		deleteBar.y = deleteBar.y + 60
@@ -97,6 +104,12 @@ function M.new()
 			timeBar.y = timeBar.y - extraYDif
 			scoreTxt.y = scoreTxt.y - extraYDif
 			botBar.y = botBar.y + extraYDif
+		elseif modelName == "NookHD" then
+			topBar.y = topBar.y + yDif - 2
+			menuButton.y = menuButton.y + yDif - 2
+			timeBar.y = timeBar.y + yDif - 2
+			scoreTxt.y = scoreTxt.y + yDif - 2
+			botBar.y = botBar.y - yDif + 2
 		end
 	end
 
@@ -221,12 +234,42 @@ function M.new()
 				setEnterFrame(nil)
 				director:changeScene("menu", "crossfade")
 			end
+			local function goToAppcano ()
+				print("appcano")
+				--pause everything
+				-- setEnterFrame(nil)
+				-- physics.pause()
+				-- local options =
+				-- {
+				--     hasBackground = true,  -- default: true
+				--     autoCancel = false,  -- default: true (android)
+				--     urlRequest = listener_function,  -- default: nil
+				-- }
+				-- local x, y, width, height = 20, 50, cw-40, ch-100
+				-- local deviceModel = findModel()
+				-- if deviceModel == "NookHD" then
+				-- 	height = ch-125
+				-- end 
+				system.openURL( "http://appcano.com" )
+
+				-- native.showWebPopup( x, y, width, height, "http://appcano.com"  )
+				-- local function exitWebPopup()
+				-- 	print("EXIT POPU")
+				-- 	--resume everything
+				-- 	physics.start()
+				-- 	setEnterFrame(enterFrame)
+				-- 	native.cancelWebPopup()
+				-- 	fade:removeEventListener("tap", exitWebPopup)
+				-- end
+				-- timer.performWithDelay(100, function() fade:addEventListener("tap", exitWebPopup) end, 1)
+			end
 			--create buttons and text
 			--appcano ad
 			local appcanoAdd = display.newImage(group, "Images/appcanoAd.png", 0, 0)
-			appcanoAdd.x, appcanoAdd.y = cw/2-2, ch/2 + 225
+			appcanoAdd.x, appcanoAdd.y = cw/2-2, ch/2 + 165
 			appcanoAdd:scale(0.9, 0.9)
 			pulseObj(appcanoAdd, 0.05, 500)
+			appcanoAdd:addEventListener("tap", goToAppcano)
 			--pause - quit buttons
 			pausedText = display.newText(group, "Game Over!", 0, 0, "Hiruko", 60)
 			pausedText.x, pausedText.y = cw/2, ch/2-300
@@ -236,11 +279,11 @@ function M.new()
 			divider = display.newRect(group, 0, 0, cw-250, 5)
 			divider.x, divider.y = cw/2, pausedText.y + 30
 			--Resume Button
-			resumeButton = displayNewButton(group, "Images/buttonResume.png", "Images/buttonResumeTapped.png", cw/2 - 258, divider.y + 205, false, 1, 0, nil, "Replay", 255, 255, 255, "Hiruko", 50, resume, 1)
+			resumeButton = displayNewButton(group, "Images/buttonResume.png", "Images/buttonResumeTapped.png", cw/2 - 258, divider.y + 130, false, 1, 0, nil, "Replay", 255, 255, 255, "Hiruko", 50, resume, 1)
 			--Quit Button
-			quitButton = displayNewButton(group, "Images/buttonExit.png", "Images/buttonExitTapped.png", cw/2 - 258, divider.y + 305, false, 1, 0, nil, "Quit", 255, 255, 255, "Hiruko", 50, quit, 1)
+			quitButton = displayNewButton(group, "Images/buttonExit.png", "Images/buttonExitTapped.png", cw/2 - 258, divider.y + 230, false, 1, 0, nil, "Quit", 255, 255, 255, "Hiruko", 50, quit, 1)
 			-- Tweet button
-			tweetBtn = displayNewButton(group, "Images/tweet.png", "Images/tweet.png", cw/2-130, ch/2-155, false, 1, 0, nil, "", 255, 255, 255, "Hiruko", 50, tweet, 1)
+			--tweetBtn = displayNewButton(group, "Images/tweet.png", "Images/tweet.png", cw/2-130, ch/2-155, false, 1, 0, nil, "", 255, 255, 255, "Hiruko", 50, tweet, 1)
 
 		end
 	end
@@ -521,6 +564,9 @@ function M.new()
 
 	local function endGame()
 		menu("end")
+		if score ~= 0 then
+			scoredojo.submitHighscore (baseLink, token, 1, score)
+		end
 	end
 
 	enterFrame = function ()

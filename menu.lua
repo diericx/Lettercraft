@@ -2,6 +2,8 @@ local M = {}
 function M.new()
 	local group = display.newGroup()
 
+	display.setStatusBar( display.HiddenStatusBar )
+
 	--check for ser info, if there create header
 	local userInfo = Load("userInfo", userInfo)
 	--server stuff
@@ -11,6 +13,8 @@ function M.new()
 	if userInfo ~= nil and userInfo.authKey ~= nil then
 		headers["Authorization"] = "Token token="..tostring(userInfo.authKey)
 	end
+
+	token = "0295e83b1031e2412ef0cc26045b2366"
 
 	-- local bg = display.newRect(group, 0, 0, cw, ch)
 	-- bg:setFillColor(250, 250, 250)
@@ -41,6 +45,13 @@ function M.new()
 	                local i = event.index
 	                if 1 == i then -- No
 	                	print("rate")
+						local options =
+						{
+						   iOSAppId = "670830956",
+						   nookAppEAN = "2940147138588",
+						   supportedAndroidStores = { "nook" },
+						}
+						native.showPopup("rateApp", options)
 	                elseif 2 == i then -- Yes
 	                	print("Remind me")
 	                elseif 3 == i then -- Yes
@@ -68,6 +79,9 @@ function M.new()
 						   body = ""
 						}
 						native.showPopup("mail", options)
+						local menuCount  = Load("menuCount")
+						menuCount.shouldDisplayPopup = false
+						Save(menuCount, "menuCount")
 	                        --system.openURL( "http://developer.anscamobile.com" )	                		
 	                        -- Do nothing; dialog will simply dismiss
 	                elseif 2 == i then -- Yes
@@ -75,6 +89,7 @@ function M.new()
 	                	-- native.cancelAlert(doYouLoveAlert)
 	                	local thanksTxt = "We are so happy to hear that you love Lettercraft! It'd be really helpful if you rated us in the App Store."
 	                	thanksAlert = native.showAlert( "Thank you!", thanksTxt, { "Rate Lettercraft", "Remind Me Later", "No Thanks" }, thanksPopListener )
+	                	--thanksAlert = native.showAlert( "Thank you!", thanksTxt, { "Maybe later" }, thanksPopListener )
 	                        -- Open URL if "Learn More" (the 2nd button) was clicked
 	                end
 	        end
@@ -219,6 +234,7 @@ function M.new()
 
 	local function setWallTWall()
 		gameMode="WallToWall"
+		token = "3d59539700c3cdc77c43d3b3e415891d"
 	end
 
 	local rushBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 - 300, false, 1, 0, "gameNew", "Rush", 150, 150, 150, "Hiruko", 80, nil, nil)
@@ -227,7 +243,7 @@ function M.new()
 
 	-- move things according to device
 	local modelName = findModel()
-	if modelName == "Nook" or modelName == "iPhone5" or modelName == "iPhoneBelow5" or modelName == "Macbook" then
+	if modelName == "Nook" or modelName == "NookHD" or modelName == "iPhone5" or modelName == "iPhoneBelow5" or modelName == "Macbook" then
 
 		print("DIF MODEL!")
 		local yDif = 50
@@ -245,13 +261,97 @@ function M.new()
 		soundOverlay.y = soundOverlay.y - yDif
 
 		-- more specifics
-		if modelName == "Nook" or modelName == "Macbook" then
+		if modelName == "Nook" or modelName == "NookHD" or modelName == "Macbook" then
 			-- create the leaderboard btn
-			local leaderboardsBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 + 100, false, 1, 0, "leaderboards", "Leaderboards", 150, 150, 150, "Hiruko", 55, nil, nil)
+			--local infiniFallLeaderboards = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 + 100, false, 1, 0, "leaderboards", "infinifall Lb", 150, 150, 150, "Hiruko", 55, nil, nil)
+			--local wallToWallLeaderboards = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 + 100, false, 1, 0, "leaderboards", "WallToWall LB", 150, 150, 150, "Hiruko", 55, nil, nil)
+			local function goRushLB(self, event)
+				if event.phase == "began" then
+					self:setFillColor(210, 210, 255)
+				elseif event.phase == "ended" then
+					self:setFillColor(235, 235, 255)
+					token = "0295e83b1031e2412ef0cc26045b2366"
+					if modelName == "NookHD" then
+						director:changeScene("leaderboardsNookHD", "moveFromLeft")
+					else
+						director:changeScene("leaderboards", "moveFromLeft")
+					end
+				end
+			end
+
+			local function goWTWLB(self, event)
+				if event.phase == "began" then
+					self:setFillColor(210, 210, 255)
+				elseif event.phase == "ended" then
+					self:setFillColor(235, 235, 255)
+					token = "3d59539700c3cdc77c43d3b3e415891d"
+					if modelName == "NookHD" then
+						director:changeScene("leaderboardsNookHD", "moveFromRight")
+					else 
+						director:changeScene("leaderboards", "moveFromRight")
+					end
+				end
+			end
+
+			local rushLB = display.newImage (group, "Images/button.png", 0, 0)
+			rushLB:setFillColor(235, 235, 255) --220
+			rushLB:scale(0.9, 0.9)
+			rushLB.x, rushLB.y = cw/2 - 150, ch/2 + 170
+			rushLB.touch = goRushLB
+			rushLB:addEventListener("touch", rushLB)
+
+			local wallToWallLB = display.newImage (group, "Images/button.png", 0, 0)
+			wallToWallLB:setFillColor(235, 235, 255)
+			wallToWallLB:scale(0.9, 0.9)
+			wallToWallLB.x, wallToWallLB.y = cw/2 + 150, ch/2 + 170
+			wallToWallLB.touch = goWTWLB
+			wallToWallLB:addEventListener("touch", wallToWallLB)
+
+			local rushLBtxt = display.newMultiLineText  
+		        {
+		        text = "Rush Leaderboards",
+		        width = 250,                  --OPTIONAL        Defailt : nil 
+		        left = cw/2 - 150,top = ch/2 + 170,             --OPTIONAL        Default : left = 0,top=0
+		        font = "Hiruko",     --OPTIONAL        Default : native.systemFont
+		        fontSize = 40,                --OPTIONAL        Default : 14
+		        color = {90,90,90},              --OPTIONAL        Default : {0,0,0}
+		        align = "center"              --OPTIONAL   Possible : "left"/"right"/"center"
+		        }
+		    rushLBtxt.x = cw/2 - 150
+		    rushLBtxt.y = ch/2 + 170
+
+		    group:insert(rushLBtxt)
+
+			local wtwLBText = display.newMultiLineText  
+		        {
+		        text = "Wall To Wall Leaderboards",
+		        width = 250,                  --OPTIONAL        Defailt : nil 
+		        left = cw/2 - 150,top = ch/2 + 170,             --OPTIONAL        Default : left = 0,top=0
+		        font = "Hiruko",     --OPTIONAL        Default : native.systemFont
+		        fontSize = 40,                --OPTIONAL        Default : 14
+		        color = {90,90,90},              --OPTIONAL        Default : {0,0,0}
+		        align = "center"              --OPTIONAL   Possible : "left"/"right"/"center"
+		        }
+		    wtwLBText.x = cw/2 + 150
+		    wtwLBText.y = ch/2 + 170
+
+		    group:insert(wtwLBText)
+		    if modelName == "NookHD" then
+		    	local yDif = 48
+				tutorialBtn.y = tutorialBtn.y + yDif
+				tutorialBtnD.y = tutorialBtnD.y + yDif
+				tutorialBtnOverlay.y = tutorialBtnOverlay.y + yDif
+				soundBtn.y = soundBtn.y + yDif 
+				soundBtnD.y = soundBtnD.y   + yDif
+				soundBtnOutline.y = soundBtnOutline.y   + yDif
+				soundBtnOutlineD.y = soundBtnOutlineD.y   + yDif
+				soundOverlay.y = soundOverlay.y  + yDif
+			end
 
 		elseif modelName == "iPhone5" then
 			-- move bg
-			bg.y = bg.y - 50
+			bg:scale(1, 1.1)
+			bg.y = bg.y - 100
 			-- move mail down a bit more
 			mail.y = mail.y + yDif
 			multiLineText.y = multiLineText.y + yDif
