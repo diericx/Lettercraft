@@ -88,7 +88,7 @@ function M.new()
 	-- move stuff according to device
 	local modelName = findModel()
 	if modelName == "Nook" or modelName == "iPhone5" or modelName == "Macbook" or modelName == "NookHD" then
-		local yDif = 87
+		local yDif = 67
 		local extraYDif = 22
 		bg.y = bg.y - yDif
 		letterSpawnY = letterSpawnY - 50

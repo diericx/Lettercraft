@@ -14,6 +14,16 @@ function M.new()
 		headers["Authorization"] = "Token token="..tostring(userInfo.authKey)
 	end
 
+	local function rate()
+		local options =
+		{
+		   iOSAppId = "670830956",
+		   nookAppEAN = "2940147138588",
+		   supportedAndroidStores = {"google", "nook" },
+		}
+		native.showPopup("rateApp", options)
+	end
+
 	token = "0295e83b1031e2412ef0cc26045b2366"
 
 	-- local bg = display.newRect(group, 0, 0, cw, ch)
@@ -40,18 +50,14 @@ function M.new()
 
 	local mail = displayNewButton(group, "Images/mail.png", nil, cw/2 - 100, ch - 335, true, 0.8, 0, "gameNew", "", 150, 150, 150, "Hiruko", 80, nil, nil)
 	mail.x, mail.y = cw/2 - 100, ch - 240
+	local thanksAlert
 	local function thanksPopListener( event )
 	        if "clicked" == event.action then
 	                local i = event.index
 	                if 1 == i then -- No
 	                	print("rate")
-						local options =
-						{
-						   iOSAppId = "670830956",
-						   nookAppEAN = "2940147138588",
-						   supportedAndroidStores = { "nook" },
-						}
-						native.showPopup("rateApp", options)
+	                	native.cancelAlert(thanksAlert)
+	                	timer.performWithDelay(200, rate, 1)
 	                elseif 2 == i then -- Yes
 	                	print("Remind me")
 	                elseif 3 == i then -- Yes
@@ -67,15 +73,14 @@ function M.new()
 	-- feedback popup listener
 	-- Handler that gets notified when the alert closes
 	local doYouLoveAlert
-	local thanksAlert
 	local function popupListener( event )
 	        if "clicked" == event.action then
 	                local i = event.index
 	                if 1 == i then -- No
 	                	local options =
 						{
-						   to = "appdojostudios@gmail.com",
-						   subject = "Give Feedback",
+						   to = "admin@appdojo.com",
+						   subject = "Give Us Feedback!",
 						   body = ""
 						}
 						native.showPopup("mail", options)
@@ -88,7 +93,10 @@ function M.new()
 	                	print("Rate")
 	                	-- native.cancelAlert(doYouLoveAlert)
 	                	local thanksTxt = "We are so happy to hear that you love Lettercraft! It'd be really helpful if you rated us in the App Store."
-	                	thanksAlert = native.showAlert( "Thank you!", thanksTxt, { "Rate Lettercraft", "Remind Me Later", "No Thanks" }, thanksPopListener )
+	                	native.cancelAlert(doYouLoveAlert)
+	                	timer.performWithDelay(200, function() 
+	                		thanksAlert = native.showAlert( "Thank you!", thanksTxt, { "Rate Lettercraft", "Remind Me Later", "No Thanks" }, thanksPopListener )
+	                	end, 1)
 	                	--thanksAlert = native.showAlert( "Thank you!", thanksTxt, { "Maybe later" }, thanksPopListener )
 	                        -- Open URL if "Learn More" (the 2nd button) was clicked
 	                end
@@ -220,7 +228,7 @@ function M.new()
 		print("New MAil")
 		local options =
 		{
-		   to = "appdojostudios@gmail.com",
+		   to = "admin@appdojo.com",
 		   subject = "I Found a Missing Word!",
 		   body = ""
 		}
