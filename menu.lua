@@ -245,34 +245,37 @@ function M.new()
 		token = "3d59539700c3cdc77c43d3b3e415891d"
 	end
 
-	local rushBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 - 300, false, 1, 0, "gameNew", "Rush", 150, 150, 150, "Hiruko", 80, nil, nil)
-	local infiniBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 - 150, false, 1, 0, "gameNew", "Infini-Fall", 150, 150, 150, "Hiruko", 80, setInfini, nil)
-	local wallToWallBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 , false, 1, 0, "gameNew", "Wall To Wall", 150, 150, 150, "Hiruko", 68, setWallTWall, nil)
+	--local testBtn = display.newImage(group, "Images/clearBtn.png", 0, 230)
+
+	local rushBtn = displayNewButton(group, "Images/clearBtn.png", "Images/clearBtnDwn.png", cw/2 - 350, ch/2 - 300, false, 1, 0, "playMenu", "Play", 255, 255, 255, "Hiruko", 80, nil, nil)
+	--rushBtn.alpha = 0.8
+	local infiniBtn = displayNewButton(group, "Images/clearBtn.png", "Images/clearBtnDwn.png", cw/2 - 350, ch/2 - 150, false, 1, 0, "gameNew", "Shop", 255, 255, 255, "Hiruko", 80, setInfini, nil)
+	local wallToWallBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 + 1000 , false, 1, 0, "gameNew", "About", 150, 150, 150, "Hiruko", 68, setWallTWall, nil)
 
 	-- move things according to device
 	local modelName = findModel()
-	if modelName == "Nook" or modelName == "NookHD" or modelName == "iPhone5" or modelName == "iPhoneBelow5" or modelName == "Macbook" then
+	if modelName == "Nook" or modelName == "NookHD" or modelName == "iPhone5" or modelName == "iPhoneBelow5" or modelName == "Android" or modelName == "Macbook" then
 
 		print("DIF MODEL!")
-		local yDif = 50
-		rushBtn.y = rushBtn.y - yDif
-		infiniBtn.y = infiniBtn.y - yDif
-		wallToWallBtn.y = wallToWallBtn.y - yDif
-		-- tut and sound btns
-		tutorialBtn.y = tutorialBtn.y - yDif
-		tutorialBtnD.y = tutorialBtnD.y - yDif
-		tutorialBtnOverlay.y = tutorialBtnOverlay.y - yDif
-		soundBtn.y = soundBtn.y - yDif
-		soundBtnD.y = soundBtnD.y - yDif 
-		soundBtnOutline.y = soundBtnOutline.y - yDif
-		soundBtnOutlineD.y = soundBtnOutlineD.y - yDif
-		soundOverlay.y = soundOverlay.y - yDif
+		if modelName ~= "Android" then
+			local yDif = 50
+			rushBtn.y = rushBtn.y - yDif
+			infiniBtn.y = infiniBtn.y - yDif
+			wallToWallBtn.y = wallToWallBtn.y - yDif
+			-- tut and sound btns
+			tutorialBtn.y = tutorialBtn.y - yDif
+			tutorialBtnD.y = tutorialBtnD.y - yDif
+			tutorialBtnOverlay.y = tutorialBtnOverlay.y - yDif
+			soundBtn.y = soundBtn.y - yDif
+			soundBtnD.y = soundBtnD.y - yDif 
+			soundBtnOutline.y = soundBtnOutline.y - yDif
+			soundBtnOutlineD.y = soundBtnOutlineD.y - yDif
+			soundOverlay.y = soundOverlay.y - yDif
+		end
 
 		-- more specifics
 		if modelName == "Nook" or modelName == "NookHD" or modelName == "Macbook" then
-			-- create the leaderboard btn
-			--local infiniFallLeaderboards = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 + 100, false, 1, 0, "leaderboards", "infinifall Lb", 150, 150, 150, "Hiruko", 55, nil, nil)
-			--local wallToWallLeaderboards = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 + 100, false, 1, 0, "leaderboards", "WallToWall LB", 150, 150, 150, "Hiruko", 55, nil, nil)
+			--if it is not an android device, display scoredojo leaderboards
 			local function goRushLB(self, event)
 				if event.phase == "began" then
 					self:setFillColor(210, 210, 255)
@@ -344,6 +347,7 @@ function M.new()
 		    wtwLBText.y = ch/2 + 170
 
 		    group:insert(wtwLBText)
+
 		    if modelName == "NookHD" then
 		    	local yDif = 48
 				tutorialBtn.y = tutorialBtn.y + yDif
@@ -355,7 +359,6 @@ function M.new()
 				soundBtnOutlineD.y = soundBtnOutlineD.y   + yDif
 				soundOverlay.y = soundOverlay.y  + yDif
 			end
-
 		elseif modelName == "iPhone5" then
 			-- move bg
 			bg:scale(1, 1.1)
@@ -385,6 +388,21 @@ function M.new()
 			tutorialBtn.y = tutorialBtn.y + bellow5Dif
 			tutorialBtnD.y = tutorialBtnD.y + bellow5Dif
 			tutorialBtnOverlay.y = tutorialBtnOverlay.y + bellow5Dif
+		elseif modelName == "Android" then
+			--ANDOID LEADERBOARDS
+			---------
+			-- local function showLeaderboards( event )
+			-- 	print("DROID")
+			--     if ( system.getInfo("platformName") == "Android" ) then
+			--     	gameNetwork.show( "leaderboards" )
+			--     else
+			--     	gameNetwork.show( "leaderboards", { leaderboard = {timeScope="AllTime"} } )
+			--     end
+			--     return true
+			-- end
+			-- showLeaderboards()
+
+			
 		end
 	end
 	--group:insert(leaderboardsBtnH)

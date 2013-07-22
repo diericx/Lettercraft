@@ -2,6 +2,7 @@ local mime = require "mime"
 json = require "json"
 --widget = require "widget"
 scoredojo = require "scoredojo"
+gameNetwork = require "gameNetwork"
 require "multiline_text"
 local onEnterFrame = false
 local lastTime = system.getTimer()
@@ -57,6 +58,29 @@ print(alphabet[1].letter)
 -- local params = { accessKey = CC_Access_Key, secretKey = CC_Secret_Key, }
 -- gameNetwork.init( "corona", params )
 
+-- local gameNetwork = require "gameNetwork"
+-- local loggedIntoGC = false
+ 
+-- -- called after the "init" request has completed
+-- local function initCallback( event )
+--     if event.data then
+--         loggedIntoGC = true
+--         --native.showAlert( "Success!", "User has logged into Game Center", { "OK" } )
+--     else
+--         loggedIntoGC = false
+--         --native.showAlert( "Fail", "User is not logged into Game Center", { "OK" } )
+--     end
+-- end
+ 
+-- -- function to listen for system events
+-- local function onSystemEvent( event ) 
+--     if event.type == "applicationStart" then
+--         gameNetwork.init( "gamecenter", initCallback )
+--         return true
+--     end
+-- end
+-- Runtime:addEventListener( "system", onSystemEvent )
+
 function setEnterFrame( listener )   
 	onEnterFrame = listener
 end
@@ -90,6 +114,8 @@ function findModel ()
 		deviceModelName = "iPhoneBelow5"
 	elseif device.model == "BNRV200" then
 		deviceModelName = "Macbook"
+	else 
+		deviceModelName = "Android"
 	end
 	return deviceModelName
 end
@@ -170,6 +196,55 @@ if userInfo ~= nil and userInfo.authKey ~= nil then
 	print(userInfo.authKey, userInfo.username, userInfo.password)
 end
 director = require("director")
+
+
+--------
+--------ANDROID LEADERBOARDS
+--------
+
+local playerName
+
+local function loadLocalPlayerCallback( event )
+   playerName = event.data.alias
+   saveSettings()  --save player data locally using your own "saveSettings()" function
+end
+
+local function gameNetworkLoginCallback( event )
+   gameNetwork.request( "loadLocalPlayer", { listener=loadLocalPlayerCallback } )
+   return true
+end
+
+local function gpgsInitCallback( event )
+   gameNetwork.request( "login", { userInitiated=true, listener=gameNetworkLoginCallback } )
+end
+
+local function gameNetworkSetup()
+   if ( system.getInfo("platformName") == "Android" ) then
+      gameNetwork.init( "google", gpgsInitCallback )
+   else
+      gameNetwork.init( "gamecenter", gameNetworkLoginCallback )
+   end
+end
+
+------HANDLE SYSTEM EVENTS------
+local function systemEvents( event )
+   print("systemEvent " .. event.type)
+   if ( event.type == "applicationSuspend" ) then
+      print( "suspending..........................." )
+   elseif ( event.type == "applicationResume" ) then
+      print( "resuming............................." )
+   elseif ( event.type == "applicationExit" ) then
+      print( "exiting.............................." )
+   elseif ( event.type == "applicationStart" ) then
+      gameNetworkSetup()  --login to the network here
+   end
+   return true
+end
+
+Runtime:addEventListener( "system", systemEvents )
+
+
+
 -- director = {
 --     scene = 'main',
 --     changeScene = function (self, moduleName)

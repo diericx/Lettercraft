@@ -31,15 +31,31 @@ settings = {
                 }
             }
             --]]
-		}
+		},
+        components = {
+        
+        }
 	},
     
     android = 
     {
+
+        googlePlayGamesAppId = "182739516720",
+
         usesPermissions =
         {
-            "android.permission.INTERNET",
+            "android.permission.INTERNET", 
         }
 
-    }
+    },
+
+    plugins =
+    {
+       --key is the name passed to the Lua "require()"
+       ["CoronaProvider.gameNetwork.google"] =
+       {
+          --required!
+          publisherId = "com.coronalabs",
+       },
+    },
 }

@@ -86,7 +86,7 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 	--local backBtn = displayNewButton(group, "scoredojo/buttonUpSmall.png", "scoredojo/buttonDownSmall.png", 20, 10, false, 1, nil, "menu", "Back", "Hiruko", 40, removeFields, nil)	
 	local backBtn = displayNewButton(group, "scoredojo/buttonUpSmall.png", "scoredojo/buttonDownSmall.png", 20, -50, false, 1, nil, "menu", "Back", 25, 25, 25, "Hiruko", 40, removeFields, nil)
 	
-    if findModel() == "NookHD" then
+    if findModel() == "NookHD" or findModel() == "Android" then
     	topBar.y = topBar.y + 50
     	backBtn.y = backBtn.y + 55
     end
@@ -394,7 +394,7 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 	        buttons=tabButtons,
 	    }
 
-	    if findModel() == "NookHD" or findModel() ==  "Macbook" then
+	    if findModel() == "NookHD" or findModel() == "Android" or findModel() ==  "Macbook" then
 			tabs.y = tabs.y - 80
 	    end
 
@@ -688,7 +688,7 @@ function M.start (baseLink, leaderboardKey, leaderBoardCount)
 	    }
 	    group:insert(tabs)
 
-	    if findModel() == "NookHD" then
+	    if findModel() == "NookHD" or findModel() == "Android" then
 	    	tabs.y = tabs.y - 65
 	    end
 
