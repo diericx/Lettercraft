@@ -26,6 +26,7 @@ function M.new()
 	local difficultyCooldown = difficultyTimer
 	local doubleChance = 90
 	local canDisplayGameOver = true
+	local canSwipe = true
 	local swipeStartX
 	local swipeStartY
 	local swipeEndX
@@ -40,16 +41,72 @@ function M.new()
 	local path = system.pathForFile("dictionary.sqlite")
 	local db = sqlite3.open( path ) --remember to close
 
+	menuCount = Load("menuCount")
 	--change difficulty for game modes
 	if gameMode == "WallToWall" then
 		token = "3d59539700c3cdc77c43d3b3e415891d"
+		myCategory = "CgkIsPr-4KgFEAIQAQ"
 		currentTime = 105 --45
 		timeCapacity = currentTime
+		menuCount.wtw = true
+		Save(menuCount, "menuCount")
 	elseif gameMode == "Rush" then
+		--scoredojo
 		token = "0295e83b1031e2412ef0cc26045b2366"
+		--gpgs
+		myCategory = "CgkIsPr-4KgFEAIQAA"
+		menuCount.rush = true
+		Save(menuCount, "menuCount")
 	elseif gameMode == "InfiniFall" then
 		token = "f95822abccd7daa4928babac186796a8"
+		menuCount.infini = true
+		Save(menuCount, "menuCount")
 	end
+
+	local gameModesPlayed = 0
+
+	if menuCount.wtw == true then
+		gameModesPlayed = gameModesPlayed + 1
+	end
+	if menuCount.rush == true then
+		gameModesPlayed = gameModesPlayed + 1
+	end
+	if menuCount.infini == true then
+		gameModesPlayed = gameModesPlayed + 1
+	end
+
+	local modelName = findModel()
+	--I <3 gamemodes
+	if gameModesPlayed == 3 and menuCount.shouldDisplyILove == true then
+		menuCount.shouldDisplyILove = false
+		Save(menuCount, "menuCount")
+		--android/ios acheivment
+		if modelName == "Android" then
+			print("I <3 GAME MODES")
+			myAchievement = "CgkIsPr-4KgFEAIQBw"
+
+			gameNetwork.request( "unlockAchievement",
+			{
+			   achievement = { identifier="CgkIsPr-4KgFEAIQBw", percentComplete=100, showsCompletionBanner=true },
+			   listener = achievementRequestCallback
+			} )
+		end
+	elseif gameModesPlayed == 2 and menuCount.shouldDisplayTheresMore == true then
+		menuCount.shouldDisplayTheresMore = false
+		Save(menuCount, "menuCount")
+		--android/ios acheivment
+		if modelName == "Android" then
+			print("THERES MORE TO THE GAME??")
+			myAchievement = "CgkIsPr-4KgFEAIQBg"
+
+			gameNetwork.request( "unlockAchievement",
+			{
+			   achievement = { identifier="CgkIsPr-4KgFEAIQBg", percentComplete=100, showsCompletionBanner=true },
+			   listener = achievementRequestCallback
+			} )
+		end
+	end
+
 
 	local function untouchable ()
 		print("Aint nobody gon touch mah chillen")
@@ -111,6 +168,8 @@ function M.new()
 			scoreTxt.y = scoreTxt.y + yDif - 2
 			botBar.y = botBar.y - yDif + 2
 		end
+	elseif modelName == "Android" then
+
 	end
 
 	local function playAudio(audioVar)
@@ -447,126 +506,151 @@ function M.new()
 
 	--swipe function
 	local function dockListener (event)
-		local swipeR = false
-		local swipeL = false
-		if event.phase == "began" then
-			--log the start touch position
-			swipeStartX = event.x
-			swipeStartY = event.y
-		elseif event.phase == "ended" then
-			--create end x and y
-			swipeEndX = event.x
-			swipeEndY = event.y 
-			local xDif = swipeEndX - swipeStartX
-			print(xDif)
-			--find end x and end y and see if it was a swipe
-			if swipeStartX < swipeEndX and xDif > 40 then -- check X for swipe
-				-- swipe right
-				swipeR = true
-				print("WAS A SWIPE!!!")
-			elseif swipeStartX > swipeEndX and xDif < -40 then
-				-- swipe left
-				swipeL = true
-				print("WAS A SWIPE!!!")
-			end
+		if canSwipe == true then
+			local swipeR = false
+			local swipeL = false
+			if event.phase == "began" then
+				--log the start touch position
+				swipeStartX = event.x
+				swipeStartY = event.y
+			elseif event.phase == "ended" then
+				--create end x and y
+				swipeEndX = event.x
+				swipeEndY = event.y 
+				local xDif = swipeEndX - swipeStartX
+				print(xDif)
+				--find end x and end y and see if it was a swipe
+				if swipeStartX < swipeEndX and xDif > 40 then -- check X for swipe
+					-- swipe right
+					swipeR = true
+					print("WAS A SWIPE!!!")
+				elseif swipeStartX > swipeEndX and xDif < -40 then
+					-- swipe left
+					swipeL = true
+					print("WAS A SWIPE!!!")
+				end
 
-			if swipeR or swipeL then --if it was a swipe then check if it is valid
-				--if there is no word highlight the box
-				if word == nil then 
-					print("Make a word first!")
-				else -- if there is a word, check its validity
-					print(word)
-					local isWordValid = isWordValid(word)
-					print(isWordValid)
-					if isWordValid == true then
-						playAudio(correctSound)
-						print("YOU WIN YOU WINNER!")
-						scoreToAdd = 0
-						--use multipliers
-						local multiplier = 0
+				if swipeR or swipeL then --if it was a swipe then check if it is valid
+					--if there is no word highlight the box
+					if word == nil then 
+						print("Make a word first!")
+					else -- if there is a word, check its validity
+						print(word)
+						local isWordValid = isWordValid(word)
+						print(isWordValid)
+						if isWordValid == true then
+							canSwipe = false
+							playAudio(correctSound)
+							print("YOU WIN YOU WINNER!")
+							scoreToAdd = 0
+							--use multipliers
+							local multiplier = 0
 
-						for i = 1, #chosenLetters do
-							if chosenLetters[i].multiplier > 1 then
-								multiplier = multiplier + chosenLetters[i].multiplier
+							for i = 1, #chosenLetters do
+								if chosenLetters[i].multiplier > 1 then
+									multiplier = multiplier + chosenLetters[i].multiplier
+								end
+								scoreToAdd = scoreToAdd + chosenLetters[i].value
+								scoreTxt.text = score
+								local goToX = 0
+								if swipeR == true then
+									goToX = 1000
+								elseif swipeL == true then
+									goToX = -500
+								end
+								transition.to(chosenLetters[i], {x = goToX, onComplete = function() end})
+								transition.to(chosenLetters[i].text, {x = goToX, onComplete = function() end})
+								transition.to(chosenLetters[i].overlay, {x = goToX, onComplete = function() end})	
+								if i == #chosenLetters then
+									transition.to(chosenLetters[i].multTxt, {x = 1000, onComplete = function() clearChosenLetter(chosenLetters[i]) word = "" chosenLetters = {} canSwipe = true end})	
+								else 
+									transition.to(chosenLetters[i].multTxt, {x = 1000, onComplete = function() clearChosenLetter(chosenLetters[i])end})	
+								end
 							end
-							scoreToAdd = scoreToAdd + chosenLetters[i].value
-							scoreTxt.text = score
-							local goToX = 0
-							if swipeR == true then
-								goToX = 1000
-							elseif swipeL == true then
-								goToX = -500
+							--multiplier
+							if multiplier > 0 then
+								scoreToAdd = scoreToAdd * multiplier
 							end
-							transition.to(chosenLetters[i], {x = goToX, onComplete = function() end})
-							transition.to(chosenLetters[i].text, {x = goToX, onComplete = function() end})
-							transition.to(chosenLetters[i].overlay, {x = goToX, onComplete = function() end})	
-							if i == #chosenLetters then
-								transition.to(chosenLetters[i].multTxt, {x = 1000, onComplete = function() clearChosenLetter(chosenLetters[i]) word = "" chosenLetters = {} end})	
-							else 
-								transition.to(chosenLetters[i].multTxt, {x = 1000, onComplete = function() clearChosenLetter(chosenLetters[i])end})	
-							end
-						end
-						--multiplier
-						if multiplier > 0 then
-							scoreToAdd = scoreToAdd * multiplier
-						end
-						--add to the time
-						print("currentTime=", currentTime)
+							--add to the time
+							print("currentTime=", currentTime)
 
-						--add to the score
-						if gameMode ~= "WallToWall" then
-							scoreToAdd = scoreToAdd * 1.5
-						end
-						scoreToAdd = scoreToAdd * #chosenLetters
-						currentTime = currentTime + scoreToAdd
-						--print stuff
-						print("Score=",score)
-						print("Score To Add=",scoreToAdd)
-						print("currentTimeAfter=", currentTime)
-						print("timeCapacity=", timeCapacity)
-						score = math.round(score + scoreToAdd + 100)
-						--scoreTxt.text = currentScore
-						
-					elseif isWordValid ~= true then 
-						for i = 1, #chosenLetters do 
-							chosenLetters[i].overlay:setFillColor(255, 0, 0)
-							transition.to(chosenLetters[i].overlay, {alpha = 0.6, time=200})
+							--add to the score
+							if gameMode ~= "WallToWall" then
+								scoreToAdd = scoreToAdd * 1.5
+							end
+							scoreToAdd = scoreToAdd * #chosenLetters
+							currentTime = currentTime + scoreToAdd
+							--print stuff
+							print("Score=",score)
+							print("Score To Add=",scoreToAdd)
+							print("currentTimeAfter=", currentTime)
+							print("timeCapacity=", timeCapacity)
+							score = math.round(score + scoreToAdd + 100)
+							--scoreTxt.text = currentScore
+							
+						elseif isWordValid ~= true then 
+							for i = 1, #chosenLetters do 
+								chosenLetters[i].overlay:setFillColor(255, 0, 0)
+								transition.to(chosenLetters[i].overlay, {alpha = 0.6, time=200})
+							end
 						end
 					end
-				end
-			else -- if it wasn't a swipe
-				if #chosenLetters > 0 then
-					playAudio(clearSound)
-				end
-				for i = 1, #chosenLetters do 
-					if chosenLetters[i] then
-						local function dealWithLetters()
-							--remove the current selected words
-							clearChosenLetter(chosenLetters[i])
-							--clear the table and word at end of for loop
-							if i == #chosenLetters then
-								chosenLetters = {}
-								word = ""
+				else -- if it wasn't a swipe
+					if #chosenLetters > 0 then
+						playAudio(clearSound)
+					end
+					for i = 1, #chosenLetters do 
+						if chosenLetters[i] then
+							local function dealWithLetters()
+								--remove the current selected words
+								clearChosenLetter(chosenLetters[i])
+								--clear the table and word at end of for loop
+								if i == #chosenLetters then
+									chosenLetters = {}
+									word = ""
+								end
 							end
-						end
-						transition.to(chosenLetters[i].text, {xScale = 0.01, yScale = 0.01, time = 150})
-						transition.to(chosenLetters[i].overlay, {xScale = 0.01, yScale = 0.01, time = 150})
-						transition.to(chosenLetters[i].multTxt, {xScale = 0.01, yScale = 0.01, x = chosenLetters[i].multTxt.x - 35, y = chosenLetters[i].multTxt.y + 35, time = 150})
-						transition.to(chosenLetters[i], {xScale = 0.01, yScale = 0.01, time = 150,  onComplete = dealWithLetters})
-					end	
+							transition.to(chosenLetters[i].text, {xScale = 0.01, yScale = 0.01, time = 150})
+							transition.to(chosenLetters[i].overlay, {xScale = 0.01, yScale = 0.01, time = 150})
+							transition.to(chosenLetters[i].multTxt, {xScale = 0.01, yScale = 0.01, x = chosenLetters[i].multTxt.x - 35, y = chosenLetters[i].multTxt.y + 35, time = 150})
+							transition.to(chosenLetters[i], {xScale = 0.01, yScale = 0.01, time = 150,  onComplete = dealWithLetters})
+						end	
+					end
 				end
+			elseif event.phase == "canceled" then
 			end
-		elseif event.phase == "canceled" then
+			return true
 		end
-		return true
 	end
 	botBar:addEventListener("touch", dockListener)
 
 	local function endGame()
 		menu("end")
 		if score ~= 0 then
+			local userInfo = Load("userInfo", userInfo)
+
+			headers["Accept"] = "application/json"
+
+			if userInfo ~= nil and userInfo.authKey ~= nil then
+				headers["Authorization"] = "Token token="..tostring(userInfo.authKey)
+			end
 			scoredojo.submitHighscore (baseLink, token, 1, score)
 		end
+		--android/ios acheivment
+		if modelName == "Android" then
+			myAchievement = "CgkIsPr-4KgFEAIQAw"
+
+			gameNetwork.request( "unlockAchievement",
+			{
+			   achievement = { identifier="CgkIsPr-4KgFEAIQAw", percentComplete=100, showsCompletionBanner=true },
+			   listener = achievementRequestCallback
+			} )
+		end
+		--submit highscore
+		gameNetwork.request( "setHighScore",
+		{
+		   localPlayerScore = { category=myCategory, value=tonumber(score) }
+		} )
 	end
 
 	enterFrame = function ()
@@ -624,6 +708,7 @@ function M.new()
 			difficultyCooldown = difficultyTimer
 		end
 	end
+	setEnterFrame(nil)
 	setEnterFrame(enterFrame)
 
 	return group

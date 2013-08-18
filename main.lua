@@ -10,6 +10,16 @@ local lastTime = system.getTimer()
 token = "0295e83b1031e2412ef0cc26045b2366"
 baseLink = "https://scoredojo.com/api/v1/"
 
+--Acheivments
+
+--for GameCenter, default to the achievement name from iTunes Connect
+myAchievement = "com.lettercraft.achivementname"
+--leaderboards
+myCategory = "com.yourname.yourgame.highscores"
+
+sentEmail = false
+rated = false
+
 display.setStatusBar( display.HiddenStatusBar )
 
 
@@ -47,39 +57,9 @@ alphabet = {
 }
 print(alphabet[1].letter)
 
--- gameNetwork = require( "gameNetwork" )
-
--- CC_Access_Key = "874d15b4684aae2811308c25cf18c4c556ad5755"
--- CC_Secret_Key = "6109e4882fe07cb0abb510b6dd6a25653fa52eb6"
-
--- coronaCloud = require ( "corona-cloud-core" )
--- coronaCloud.init( CC_Access_Key, CC_Secret_Key )
-
--- local params = { accessKey = CC_Access_Key, secretKey = CC_Secret_Key, }
--- gameNetwork.init( "corona", params )
-
--- local gameNetwork = require "gameNetwork"
--- local loggedIntoGC = false
- 
--- -- called after the "init" request has completed
--- local function initCallback( event )
---     if event.data then
---         loggedIntoGC = true
---         --native.showAlert( "Success!", "User has logged into Game Center", { "OK" } )
---     else
---         loggedIntoGC = false
---         --native.showAlert( "Fail", "User is not logged into Game Center", { "OK" } )
---     end
--- end
- 
--- -- function to listen for system events
--- local function onSystemEvent( event ) 
---     if event.type == "applicationStart" then
---         gameNetwork.init( "gamecenter", initCallback )
---         return true
---     end
--- end
--- Runtime:addEventListener( "system", onSystemEvent )
+-- alphabet = {
+-- 	{letter="R", value = 1}, {letter="O", value=1}
+-- }
 
 function setEnterFrame( listener )   
 	onEnterFrame = listener
@@ -142,7 +122,7 @@ function displayBackground(group)
 end
 
 function randomLetter()
-	local randomNumber = math.random(1, 32)
+	local randomNumber = math.random(1, 32) -- 32
 	local letter
 	for i = 1, 32 do 
 		if randomNumber == i then
@@ -183,6 +163,13 @@ else
 	Save(audioData, "audioData")
 end
 
+local menuCount = Load("menuCount")
+-- if its not there, create one
+if menuCount == nil then
+	menuCount = {count = 0, top = 5, shouldDisplayPopup = true, shouldDisplayEmail = true, shouldDisplayRated = true, rush = false, wtw = false, infini = false, shouldDisplyILove = true, shouldDisplayTheresMore = true}
+	Save(menuCount, "menuCount")
+end
+
 
 --check for ser info, if there create header
 local userInfo = Load("userInfo", userInfo)
@@ -201,49 +188,99 @@ director = require("director")
 --------
 --------ANDROID LEADERBOARDS
 --------
-
 local playerName
 
-local function loadLocalPlayerCallback( event )
+function loadLocalPlayerCallback( event )
+	print(event.isError)
    playerName = event.data.alias
    saveSettings()  --save player data locally using your own "saveSettings()" function
 end
 
-local function gameNetworkLoginCallback( event )
+function gameNetworkLoginCallback ( event )
+	print(event.isError)
+	print("LOGINCALLBACK")
    gameNetwork.request( "loadLocalPlayer", { listener=loadLocalPlayerCallback } )
    return true
 end
 
-local function gpgsInitCallback( event )
-   gameNetwork.request( "login", { userInitiated=true, listener=gameNetworkLoginCallback } )
+function gpgsInitCallback ( event )
+	print(event.isError)
+	print("INITCALLBACK")
+    gameNetwork.request( "login", { userInitiated=true, listener=gameNetworkLoginCallback } )
 end
 
-local function gameNetworkSetup()
+function gameNetworkSetup ()
    if ( system.getInfo("platformName") == "Android" ) then
+   	   print("GAMENETWORKSETUP")
       gameNetwork.init( "google", gpgsInitCallback )
    else
       gameNetwork.init( "gamecenter", gameNetworkLoginCallback )
    end
 end
+local modelName = findModel()
+if modelName == "Android" or modelName == "iPhone5" or modelName == "iPhoneBelow5" then
+	gameNetworkSetup()
+end
 
 ------HANDLE SYSTEM EVENTS------
 local function systemEvents( event )
+	print(sentEmail, rated)
    print("systemEvent " .. event.type)
    if ( event.type == "applicationSuspend" ) then
       print( "suspending..........................." )
    elseif ( event.type == "applicationResume" ) then
-      print( "resuming............................." )
+   		--gameNetworkSetup()
+      	print( "resuming............................." )
+      	local modelName = findModel()
+     	menuCount = Load("menuCount")
+     	if modelName == "Android" then
+		    if sentEmail == true and menuCount.shouldDisplayEmail == true then
+		    	local modelName = findModel()
+		    	menuCount.shouldDisplayEmail = false
+		      	Save(menuCount, "menuCount")
+				--acheivment for android/ios
+				timer.performWithDelay(1000, function() 
+					print("ACHEIVMENT SENT EMAIL")
+					if modelName == "Android" then
+						myAchievement = "CgkIsPr-4KgFEAIQBA"
+
+						gameNetwork.request( "unlockAchievement",
+						{
+						   achievement = { identifier="CgkIsPr-4KgFEAIQBA", percentComplete=100, showsCompletionBanner=true },
+						   listener = achievementRequestCallback
+						} )
+					end
+				end, 1)
+		    elseif rated == true and menuCount.shouldDisplayRated == true then
+		    	local modelName = findModel()
+		    	menuCount.shouldDisplayEmail = false
+		      	Save(menuCount, "menuCount")
+				--acheivment for android/ios
+				timer.performWithDelay(1000, function() 
+					print("ACHEIVMENT rated")
+					if modelName == "Android" then
+						myAchievement = "CgkIsPr-4KgFEAIQBQ"
+
+						gameNetwork.request( "unlockAchievement",
+						{
+						   achievement = { identifier="CgkIsPr-4KgFEAIQBQ", percentComplete=100, showsCompletionBanner=true },
+						   listener = achievementRequestCallback
+						} )
+					end
+				end, 1)
+			end
+		end
    elseif ( event.type == "applicationExit" ) then
       print( "exiting.............................." )
    elseif ( event.type == "applicationStart" ) then
-      gameNetworkSetup()  --login to the network here
+		if modelName == "Android" or modelName == "iPhone5" or modelName == "iPhoneBelow5" then
+        	gameNetworkSetup()  --login to the network here
+        end
    end
    return true
 end
 
-Runtime:addEventListener( "system", systemEvents )
-
-
+--Runtime:addEventListener( "system", systemEvents )
 
 -- director = {
 --     scene = 'main',
@@ -259,7 +296,7 @@ Runtime:addEventListener( "system", systemEvents )
 --     end
 -- }
 
-function displayNewButton(group, image, imageDown, x, y, shouldScale, scaleX, timeToScale, sceneToGoTo, text, tr, tg, tb, font, textSize, customFunction, id)
+function displayNewButton(group, image, imageDown, x, y, shouldScale, scaleX, timeToScale, sceneToGoTo, text, tr, tg, tb, font, textSize, customFunction, id, textX, textY)
 	local btnGroup = display.newGroup()
 	group:insert(btnGroup)
 	local newBtn = display.newImage(image, 0, 0 )
@@ -277,6 +314,12 @@ function displayNewButton(group, image, imageDown, x, y, shouldScale, scaleX, ti
 			btnText = display.newText( text, newBtn.x, newBtn.y, font, textSize )
 			btnText:setTextColor(tr,tg,tb)
 			btnText.x, btnText.y = newBtn.x, newBtn.y + 7
+			if textX then
+				btnText.x = btnText.x + textX
+			end
+			if textY then
+				btnText.y = btnText.y + textY
+			end
 			btnGroup:insert(btnText)
 		end
 

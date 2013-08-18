@@ -15,11 +15,13 @@ function M.new()
 	end
 
 	local function rate()
+		rated = true
 		local options =
 		{
 		   iOSAppId = "670830956",
 		   nookAppEAN = "2940147138588",
 		   supportedAndroidStores = {"google", "nook" },
+		   google = "182739516720"
 		}
 		native.showPopup("rateApp", options)
 	end
@@ -50,6 +52,7 @@ function M.new()
 
 	local mail = displayNewButton(group, "Images/mail.png", nil, cw/2 - 100, ch - 335, true, 0.8, 0, "gameNew", "", 150, 150, 150, "Hiruko", 80, nil, nil)
 	mail.x, mail.y = cw/2 - 100, ch - 240
+	
 	local thanksAlert
 	local function thanksPopListener( event )
 	        if "clicked" == event.action then
@@ -160,6 +163,9 @@ function M.new()
 	local soundBtnD = display.newImage(group, "Images/soundOff.png", 140, 20, 100, 100)
 	soundBtnD.x, soundBtnD.y = 8000, 78
 
+	local btnYOffset = 0
+
+	local playBtn = displayNewButton(group, "Images/clearBtn.png", "Images/clearBtnDwn.png", cw/2 - 350, ch/2 - 300 + btnYOffset, false, 1, 0, "playMenu", "Play", 255, 255, 255, "Hiruko", 80, nil, nil)
 
 	local function goTutorial(event)
 		if event.phase == "began" then
@@ -225,6 +231,9 @@ function M.new()
 	local function newMail(event)
 		-- system.openURL( "mailto:appdojostudios@gmail.com?subject=Llama Or Duck Game&body=")
 		--ios
+		--acheivment for android/ios
+		sentEmail = true
+		--send email
 		print("New MAil")
 		local options =
 		{
@@ -233,8 +242,14 @@ function M.new()
 		   body = ""
 		}
 		native.showPopup("mail", options)
+
 	end
 	mail:addEventListener("tap", newMail)
+
+	local function setRush()
+		gameMode="Rush"
+	end
+
 
 	local function setInfini()
 		gameMode="InfiniFall"
@@ -247,21 +262,18 @@ function M.new()
 
 	--local testBtn = display.newImage(group, "Images/clearBtn.png", 0, 230)
 
-	local rushBtn = displayNewButton(group, "Images/clearBtn.png", "Images/clearBtnDwn.png", cw/2 - 350, ch/2 - 300, false, 1, 0, "playMenu", "Play", 255, 255, 255, "Hiruko", 80, nil, nil)
-	--rushBtn.alpha = 0.8
-	local infiniBtn = displayNewButton(group, "Images/clearBtn.png", "Images/clearBtnDwn.png", cw/2 - 350, ch/2 - 150, false, 1, 0, "gameNew", "Shop", 255, 255, 255, "Hiruko", 80, setInfini, nil)
-	local wallToWallBtn = displayNewButton(group, "Images/button.png", nil, cw/2 - 175, ch/2 + 1000 , false, 1, 0, "gameNew", "About", 150, 150, 150, "Hiruko", 68, setWallTWall, nil)
+	--local leaderboardsBtn = displayNewButton(group, "Images/clearBtn.png", "Images/clearBtnDwn.png", cw/2 - 350, ch/2 - 150, false, 1, 0, "gameNew", "Shop", 255, 255, 255, "Hiruko", 80, setInfini, nil)
 
 	-- move things according to device
+	local yDif
 	local modelName = findModel()
 	if modelName == "Nook" or modelName == "NookHD" or modelName == "iPhone5" or modelName == "iPhoneBelow5" or modelName == "Android" or modelName == "Macbook" then
 
 		print("DIF MODEL!")
 		if modelName ~= "Android" then
-			local yDif = 50
-			rushBtn.y = rushBtn.y - yDif
-			infiniBtn.y = infiniBtn.y - yDif
-			wallToWallBtn.y = wallToWallBtn.y - yDif
+			yDif = 60
+			playBtn.y = playBtn.y - yDif
+			--leaderboardsBtn.y = leaderboardsBtn.y - yDif
 			-- tut and sound btns
 			tutorialBtn.y = tutorialBtn.y - yDif
 			tutorialBtnD.y = tutorialBtnD.y - yDif
@@ -276,75 +288,97 @@ function M.new()
 		-- more specifics
 		if modelName == "Nook" or modelName == "NookHD" or modelName == "Macbook" then
 			--if it is not an android device, display scoredojo leaderboards
-			local function goRushLB(self, event)
-				if event.phase == "began" then
-					self:setFillColor(210, 210, 255)
-				elseif event.phase == "ended" then
-					self:setFillColor(235, 235, 255)
+			btnYOffset = 30
+
+			playBtn.y = playBtn.y + btnYOffset + 10
+
+			local function goRushLB()
+				--if event.phase == "began" then
+				--	self:setFillColor(210, 210, 255)
+				--elseif event.phase == "ended" then
+				--	self:setFillColor(235, 235, 255)
 					token = "0295e83b1031e2412ef0cc26045b2366"
 					if modelName == "NookHD" then
 						director:changeScene("leaderboardsNookHD", "moveFromLeft")
 					else
 						director:changeScene("leaderboards", "moveFromLeft")
 					end
-				end
+				--end
 			end
 
-			local function goWTWLB(self, event)
-				if event.phase == "began" then
-					self:setFillColor(210, 210, 255)
-				elseif event.phase == "ended" then
-					self:setFillColor(235, 235, 255)
+			local function goWTWLB()
+				--if event.phase == "began" then
+				--	self:setFillColor(210, 210, 255)
+				--elseif event.phase == "ended" then
+				--	self:setFillColor(235, 235, 255)
 					token = "3d59539700c3cdc77c43d3b3e415891d"
 					if modelName == "NookHD" then
 						director:changeScene("leaderboardsNookHD", "moveFromRight")
 					else 
 						director:changeScene("leaderboards", "moveFromRight")
 					end
-				end
+				--end
 			end
 
-			local rushLB = display.newImage (group, "Images/button.png", 0, 0)
-			rushLB:setFillColor(235, 235, 255) --220
-			rushLB:scale(0.9, 0.9)
-			rushLB.x, rushLB.y = cw/2 - 150, ch/2 + 170
-			rushLB.touch = goRushLB
-			rushLB:addEventListener("touch", rushLB)
+			-- local rushLB = display.newImage (group, "Images/button.png", 0, 0)
+			-- rushLB:setFillColor(235, 235, 255) --220
+			-- rushLB:scale(0.9, 0.9)
+			-- rushLB.x, rushLB.y = cw/2 - 150, ch/2 + 170
+			-- rushLB.touch = goRushLB
+			-- rushLB:addEventListener("touch", rushLB)
 
-			local wallToWallLB = display.newImage (group, "Images/button.png", 0, 0)
-			wallToWallLB:setFillColor(235, 235, 255)
-			wallToWallLB:scale(0.9, 0.9)
-			wallToWallLB.x, wallToWallLB.y = cw/2 + 150, ch/2 + 170
-			wallToWallLB.touch = goWTWLB
-			wallToWallLB:addEventListener("touch", wallToWallLB)
+			-- local wallToWallLB = display.newImage (group, "Images/button.png", 0, 0)
+			-- wallToWallLB:setFillColor(235, 235, 255)
+			-- wallToWallLB:scale(0.9, 0.9)
+			-- wallToWallLB.x, wallToWallLB.y = cw/2 + 150, ch/2 + 170
+			-- wallToWallLB.touch = goWTWLB
+			-- wallToWallLB:addEventListener("touch", wallToWallLB)
+
+			local leaderboardsIcon1 = display.newImage(group, "Images/leaderboardsIcon.png", 0, 0)
+			local leaderboardsIcon2 = display.newImage(group, "Images/leaderboardsIcon.png", 0, 0)
+
+			local leaderboardsIcon3 = display.newImage(group, "Images/leaderboardsIcon.png", 0, 0)
+			local leaderboardsIcon4 = display.newImage(group, "Images/leaderboardsIcon.png", 0, 0)
+
+			local rushLBbtn = displayNewButton(group, "Images/clearBtn.png", "Images/clearBtnDwn.png", cw/2 - 350, ch/2 - 173 + btnYOffset, false, 1, 0, nil, "", 255, 255, 255, "Hiruko", 74, goRushLB, nil)
+
+			local wtwLBbtn = displayNewButton(group, "Images/clearBtn.png", "Images/clearBtnDwn.png", cw/2 - 350, ch/2 - 0 + btnYOffset, false, 1, 0, "gameNew", "", 255, 255, 255, "Hiruko", 80, goWTWLB, nil)
+
+			leaderboardsIcon1.x, leaderboardsIcon1.y = rushLBbtn.x + 90, rushLBbtn.y+76
+			leaderboardsIcon2.x, leaderboardsIcon2.y = wtwLBbtn.x + 610, wtwLBbtn.y+76
+
+			leaderboardsIcon3.x, leaderboardsIcon3.y = wtwLBbtn.x + 90, wtwLBbtn.y+76
+			leaderboardsIcon4.x, leaderboardsIcon4.y = rushLBbtn.x + 610, rushLBbtn.y+76
+
+
 
 			local rushLBtxt = display.newMultiLineText  
 		        {
 		        text = "Rush Leaderboards",
-		        width = 250,                  --OPTIONAL        Defailt : nil 
+		        width = 350,                  --OPTIONAL        Defailt : nil 
 		        left = cw/2 - 150,top = ch/2 + 170,             --OPTIONAL        Default : left = 0,top=0
 		        font = "Hiruko",     --OPTIONAL        Default : native.systemFont
-		        fontSize = 40,                --OPTIONAL        Default : 14
-		        color = {90,90,90},              --OPTIONAL        Default : {0,0,0}
+		        fontSize = 50,                --OPTIONAL        Default : 14
+		        color = {255,255,255},              --OPTIONAL        Default : {0,0,0}
 		        align = "center"              --OPTIONAL   Possible : "left"/"right"/"center"
 		        }
-		    rushLBtxt.x = cw/2 - 150
-		    rushLBtxt.y = ch/2 + 170
+		    rushLBtxt.x = cw/2
+		    rushLBtxt.y = rushLBbtn.y + 60
 
 		    group:insert(rushLBtxt)
 
 			local wtwLBText = display.newMultiLineText  
 		        {
 		        text = "Wall To Wall Leaderboards",
-		        width = 250,                  --OPTIONAL        Defailt : nil 
+		        width = 350,                  --OPTIONAL        Defailt : nil 
 		        left = cw/2 - 150,top = ch/2 + 170,             --OPTIONAL        Default : left = 0,top=0
 		        font = "Hiruko",     --OPTIONAL        Default : native.systemFont
-		        fontSize = 40,                --OPTIONAL        Default : 14
-		        color = {90,90,90},              --OPTIONAL        Default : {0,0,0}
+		        fontSize = 50,                --OPTIONAL        Default : 14
+		        color = {255,255,255},              --OPTIONAL        Default : {0,0,0}
 		        align = "center"              --OPTIONAL   Possible : "left"/"right"/"center"
 		        }
-		    wtwLBText.x = cw/2 + 150
-		    wtwLBText.y = ch/2 + 170
+		    wtwLBText.x = cw/2
+		    wtwLBText.y = wtwLBbtn.y + 60
 
 		    group:insert(wtwLBText)
 
@@ -391,18 +425,83 @@ function M.new()
 		elseif modelName == "Android" then
 			--ANDOID LEADERBOARDS
 			---------
-			-- local function showLeaderboards( event )
-			-- 	print("DROID")
-			--     if ( system.getInfo("platformName") == "Android" ) then
-			--     	gameNetwork.show( "leaderboards" )
-			--     else
-			--     	gameNetwork.show( "leaderboards", { leaderboard = {timeScope="AllTime"} } )
-			--     end
-			--     return true
-			-- end
-			-- showLeaderboards()
+			local function loadPlayerCallback(event)
+				print("LOAD LOCAL PLAYER")
+				print(event.isError)
+			end
+			local function loginHandler ( event )
+				print(event.isError, "IsError")
+				print("LOGINCALLBACK")
+				gameNetwork.request( "loadLocalPlayer", { listener=loadPlayerCallback } )
+			    --gameNetwork.request( "loadLocalPlayer", { listener=loadLocalPlayerCallback } )
+			    return true
+			end
 
+			local function logout()
+				local alert = native.showAlert( "You are signed out of Google Play Game Services", "", { "OK"} )
+				print("LOGOUT")
+				--gameNetwork.request( "login", {listener=loginHandler} )
+				gameNetwork.request( "logout" )
+			end
+
+			local function login()
+				print("LOGIN")
+				gameNetwork.request( "login", { userInitiated = true, listener=loginHandler} )
+				--gameNetwork.request( "logout", {listener=loginHandler} )
+			end
+
+			local function showLeaderboards( event )
+				print("DROID")
+				login()
+			    if ( system.getInfo("platformName") == "Android" ) then
+			    	gameNetwork.show( "leaderboards" )
+			    else
+			    	gameNetwork.show( "leaderboards", { leaderboard = {timeScope="AllTime"} } )
+			    end
+			    return true
+			end
+
+			local function showAchievements( event )
+				login()
+			   gameNetwork.show( "achievements" )
+			   return true
+			end
+
+			local leaderboardsIcon1 = display.newImage(group, "Images/leaderboardsIcon.png", 0, 0)
+			local leaderboardsIcon2 = display.newImage(group, "Images/leaderboardsIcon.png", 0, 0)
+
+			local acheivmentsIcon1 = display.newImage(group, "Images/acheivmentsIcon.png", 0, 0)
+			local acheivmentsIcon2 = display.newImage(group, "Images/acheivmentsIcon.png", 0, 0)
+
+			local leaderboardsBtn = displayNewButton(group, "Images/clearBtn.png", "Images/clearBtnDwn.png", cw/2 - 350, ch/2 - 150 + btnYOffset, false, 1, 0, nil, "Leaderboards", 255, 255, 255, "Hiruko", 74, showLeaderboards, nil)
 			
+			--local signingBtn = displayNewButton(group, "Images/signIn.png", "Images/signInD.png", cw/2 - 132, ch/2 + 150 + btnYOffset, false, 1, 0, nil, "", 255, 255, 255, "Hiruko", 74, gameNetworkFunction, nil)
+
+			--local signinBtn = display.newImage(group, "Images/signIn.png", cw/2 - 250, ch/2 + 150 + btnYOffset)
+
+			-------
+			-------
+			-------
+			--gameNetworkSetup()
+
+			-------
+			-------
+			-------
+			local signinBtn = displayNewButton(group, "Images/signIn.png", "Images/signInD.png", cw/2 - 250, ch/2 + 150 + btnYOffset, false, 1, 0, nil, "Sign in", 100, 100, 100, "Hiruko", 50, login, nil, 30, -5)
+
+			local signoutBtn = displayNewButton(group, "Images/signIn.png", "Images/signInD.png", cw/2 - 0, ch/2 + 150 + btnYOffset, false, 1, 0, nil, "Sign out", 100, 100, 100, "Hiruko", 50, logout, nil, 35, -5)
+
+			-- signinBtn:addEventListener("tap", login)
+			-- signoutBtn:addEventListener("tap", logout)
+
+			leaderboardsIcon1.x, leaderboardsIcon1.y = leaderboardsBtn.x + 90, leaderboardsBtn.y+76
+			leaderboardsIcon2.x, leaderboardsIcon2.y = leaderboardsBtn.x + 610, leaderboardsBtn.y+76
+
+			local acheivmentsBtn = displayNewButton(group, "Images/clearBtn.png", "Images/clearBtnDwn.png", cw/2 - 350, ch/2 - 0  + btnYOffset, false, 1, 0, nil, "Acheivments", 255, 255, 255, "Hiruko", 74, showAchievements, nil)
+
+			acheivmentsIcon1.x, acheivmentsIcon1.y = acheivmentsBtn.x + 90, acheivmentsBtn.y+76
+			acheivmentsIcon2.x, acheivmentsIcon2.y = acheivmentsBtn.x + 610, acheivmentsBtn.y+76
+
 		end
 	end
 	--group:insert(leaderboardsBtnH)
